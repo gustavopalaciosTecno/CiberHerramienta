@@ -107,12 +107,17 @@ elif choice == "Gestor Seguro":
 
     with col1:
         longitud = st.slider("Longitud de la contraseña", 8, 32, 16)
+        # Añadimos checkbox de minúsculas para control total
+        incluir_minus = st.checkbox("Incluir Minúsculas", value=True)
         incluir_mayus = st.checkbox("Incluir Mayúsculas", value=True)
         incluir_numeros = st.checkbox("Incluir Números", value=True)
         incluir_especiales = st.checkbox("Incluir Símbolos (!@#$)", value=True)
 
-    # Lógica de generación
-    caracteres = string.ascii_lowercase  # Empezamos con minúsculas
+    # --- Lógica de generación corregida ---
+    caracteres = ""  # Empezamos con la cadena vacía
+
+    if incluir_minus:
+        caracteres += string.ascii_lowercase
     if incluir_mayus:
         caracteres += string.ascii_uppercase
     if incluir_numeros:
@@ -121,12 +126,21 @@ elif choice == "Gestor Seguro":
         caracteres += string.punctuation
 
     if st.button("Generar Contraseña"):
-        # Generar contraseña aleatoria segura
-        password = ''.join(random.choice(caracteres) for i in range(longitud))
+        # Verificamos que al menos una opción esté seleccionada para evitar error
+        if caracteres == "":
+            st.error("Por favor, selecciona al menos un tipo de carácter.")
+        else:
+            # Generar contraseña aleatoria segura
+            password = ''.join(random.choice(caracteres) for i in range(longitud))
 
-        st.markdown("---")
-        st.write("Tu contraseña generada:")
-        st.code(password, language="text")
+            st.markdown("---")
+            st.write("Tu contraseña generada:")
+            st.code(password, language="text")
 
-        # Cálculo de entropía básica (opcional para dar feedback)
-        st.info(f"Nivel de seguridad: {'Fuerte' if longitud >= 12 else 'Medio'}")
+            # Feedback de seguridad
+            if longitud < 12:
+                st.warning("Nivel de seguridad: Débil (se recomiendan al menos 12 caracteres)")
+            elif len(set(caracteres)) < 30:
+                st.info("Nivel de seguridad: Medio (añade más tipos de caracteres)")
+            else:
+                st.success("Nivel de seguridad: Fuerte ✅")
