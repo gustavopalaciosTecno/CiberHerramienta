@@ -10,9 +10,10 @@ st.set_page_config(page_title="CiberHerramienta Básica", layout="wide")
 st.title("🛡️ Panel de Ciberseguridad Educativo")
 st.markdown("---")
 
-# Barra lateral para navegación
+# --- BARRA LATERAL (MODIFICADA) ---
+st.sidebar.markdown("### 🖱️ Clic acá para ver las herramientas u opciones") # Título añadido
 menu = ["Inicio", "Escáner de Puertos", "Hash de Archivo", "Gestor Seguro"]
-choice = st.sidebar.selectbox("Menú", menu)
+choice = st.sidebar.selectbox("Selecciona una opción:", menu)
 
 # --- INICIO ---
 if choice == "Inicio":
