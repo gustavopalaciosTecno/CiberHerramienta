@@ -85,7 +85,8 @@ elif choice == "Escáner de Puertos":
     st.subheader("🌐 Escáner de Puertos y Riesgos")
     st.write("Esta herramienta intenta conectar con puertos específicos para ver si responden.")
 
-    target = st.text_input("Ingresa IP o Dominio (ej: google.com o 127.0.0.1)", "127.0.0.1")
+    # Cambiamos el placeholder para indicar que acepta URLs completas
+    target_input = st.text_input("Ingresa IP, Dominio o URL completa", "127.0.0.1")
 
     vulnerable_ports = {
         21: "FTP (Protocolo de Transferencia de Archivos) - Muy propenso a interceptación si no es FTPS.",
@@ -99,16 +100,25 @@ elif choice == "Escáner de Puertos":
 
     if st.button("Iniciar Escaneo"):
         try:
-            # Resolución de DNS (Funciona para dominios e IPs)
-            target_ip = socket.gethostbyname(target)
-            st.info(f"Resolviendo objetivo: **{target}** ➔ IP: **{target_ip}**")
+            # --- LÓGICA DE LIMPIEZA DE URL ---
+            # 1. Quitamos el protocolo (http:// o https://) si existe
+            clean_target = target_input.replace("https://", "").replace("http://", "")
+            # 2. Quitamos todo lo que venga después de la primera barra (rutas, parámetros)
+            clean_target = clean_target.split('/')[0]
+            # 3. Quitamos posibles espacios en blanco
+            clean_target = clean_target.strip()
+
+            # Resolución de DNS usando el objetivo limpio
+            target_ip = socket.gethostbyname(clean_target)
+
+            st.info(f"Objetivo detectado: **{clean_target}** ➔ IP: **{target_ip}**")
 
             ports_to_scan = [21, 22, 23, 80, 443, 445, 8080]
             progress_bar = st.progress(0)
 
             for i, port in enumerate(ports_to_scan):
                 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                socket.setdefaulttimeout(0.6)  # Tiempo de espera para respuesta
+                socket.setdefaulttimeout(0.6)
                 result = sock.connect_ex((target_ip, port))
 
                 if result == 0:
@@ -123,7 +133,8 @@ elif choice == "Escáner de Puertos":
                 progress_bar.progress((i + 1) / len(ports_to_scan))
 
         except socket.gaierror:
-            st.error("❌ Error: No se pudo resolver el dominio. Revisa la ortografía o tu conexión.")
+            st.error(
+                "❌ Error: No se pudo resolver la dirección. Asegúrate de que el dominio o IP sean válidos (sin rutas ni carpetas).")
         except Exception as e:
             st.error(f"❌ Error inesperado: {e}")
 
@@ -191,7 +202,6 @@ elif choice == "Hash de Archivo":
         else:
             st.success("✅ El archivo no coincide con ninguna amenaza conocida en la base local.")
 
-# --- SECCIÓN: GESTOR SEGURO ---
 # --- SECCIÓN: GESTOR SEGURO ---
 elif choice == "Gestor Seguro":
     st.subheader("🛡️ Generador de Contraseñas Robustas")
