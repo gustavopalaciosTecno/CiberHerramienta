@@ -22,11 +22,11 @@ if choice == "Inicio":
     st.write("Esta app es educativa y simula herramientas básicas de ciberseguridad hecha por Gustavo Palacios Meyer.")
 
 # --- ESCÁNER DE PUERTOS (Simulado/Básico) ---
+# --- ESCÁNER DE PUERTOS (Simulado/Básico) ---
 elif choice == "Escáner de Puertos":
     st.subheader("🌐 Escáner de Puertos y Riesgos")
     target = st.text_input("IP o Dominio a escanear", "127.0.0.1")
 
-    # Diccionario de vulnerabilidades conocidas
     vulnerable_ports = {
         21: "FTP (File Transfer Protocol) - Puede permitir acceso anónimo inseguro.",
         22: "SSH (Secure Shell) - Riesgo de ataques de fuerza bruta.",
@@ -36,27 +36,32 @@ elif choice == "Escáner de Puertos":
     }
 
     if st.button("Escanear y Analizar"):
-        st.write(f"Analizando {target}...")
+        try:
+            # Resolución de DNS: Convierte dominio a IP o valida la IP
+            target_ip = socket.gethostbyname(target)
+            st.info(f"Resolviendo objetivo: **{target}** ➔ **{target_ip}**")
 
-        # Puertos a revisar (incluimos los críticos)
-        ports_to_scan = [21, 22, 23, 80, 443, 8080, 445]
+            ports_to_scan = [21, 22, 23, 80, 443, 8080, 445]
 
-        for port in ports_to_scan:
-            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            socket.setdefaulttimeout(0.5)
-            result = sock.connect_ex((target, port))
+            for port in ports_to_scan:
+                sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                socket.setdefaulttimeout(0.5)
+                # Usamos la IP resuelta para la conexión
+                result = sock.connect_ex((target_ip, port))
 
-            if result == 0:
-                # Puerto ABIERTO
-                if port in vulnerable_ports:
-                    st.error(f"🚨 **Puerto {port} ABIERTO** - ¡PELIGRO! {vulnerable_ports[port]}")
+                if result == 0:
+                    if port in vulnerable_ports:
+                        st.error(f"🚨 **Puerto {port} ABIERTO** - ¡PELIGRO! {vulnerable_ports[port]}")
+                    else:
+                        st.warning(f"⚠️ **Puerto {port} ABIERTO** - Servicio corriendo.")
                 else:
-                    st.warning(f"⚠️ **Puerto {port} ABIERTO** - Servicio corriendo.")
-            else:
-                # Puerto CERRADO
-                st.write(f"✅ Puerto {port}: Cerrado.")
+                    st.write(f"✅ Puerto {port}: Cerrado.")
+                sock.close()
 
-            sock.close()
+        except socket.gaierror:
+            st.error("❌ Error: No se pudo resolver el dominio. Verifica que la dirección sea correcta.")
+        except Exception as e:
+            st.error(f"❌ Ocurrió un error inesperado: {e}")
 
 # --- ANÁLISIS DE MALWARE (Simulado por Hashing) ---
 elif choice == "Hash de Archivo":
