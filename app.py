@@ -178,8 +178,19 @@ elif choice == "Auditoría de Cabeceras":
                 st.error(f"No se pudo conectar con el sitio: {e}")
 
 # --- SECCIÓN: HASH DE ARCHIVO ---
+# --- SECCIÓN: HASH DE ARCHIVO ---
 elif choice == "Hash de Archivo":
     st.subheader("🔍 Análisis de Integridad (SHA-256)")
+
+    # Tip de ayuda para prevenir el AxiosError: Network Error
+    with st.expander("💡 ¿Problemas al subir archivos?"):
+        st.info("""
+        Si experimentas errores al arrastrar (Network Error):
+        * Usa el botón **'Browse files'** en lugar de arrastrar.
+        * Intenta abrir la app en **Modo Incógnito**.
+        * Desactiva bloqueadores de anuncios (AdBlock).
+        """)
+
     st.write("Sube un archivo para obtener su huella digital única y compararla con amenazas.")
 
     malware_db = {
@@ -187,20 +198,25 @@ elif choice == "Hash de Archivo":
         "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855": "Archivo vacío (Empty File)"
     }
 
-    uploaded_file = st.file_uploader("Elige un archivo...")
+    uploaded_file = st.file_uploader("Elige un archivo...", type=None)
 
     if uploaded_file is not None:
-        file_bytes = uploaded_file.read()
-        sha256_hash = hashlib.sha256(file_bytes).hexdigest()
+        try:
+            with st.spinner("Calculando huella digital..."):
+                file_bytes = uploaded_file.read()
+                sha256_hash = hashlib.sha256(file_bytes).hexdigest()
 
-        st.markdown("### Hash Resultante:")
-        st.code(sha256_hash, language="text")
+            st.markdown("### Hash Resultante (SHA-256):")
+            st.code(sha256_hash, language="text")
 
-        if sha256_hash in malware_db:
-            st.error(
-                f"🚨 **¡ALERTA!** Este hash coincide con una entrada en nuestra base de datos: {malware_db[sha256_hash]}")
-        else:
-            st.success("✅ El archivo no coincide con ninguna amenaza conocida en la base local.")
+            if sha256_hash in malware_db:
+                st.error(
+                    f"🚨 **¡ALERTA!** Este hash coincide con una entrada en nuestra base de datos: {malware_db[sha256_hash]}")
+            else:
+                st.success("✅ El archivo no coincide con ninguna amenaza conocida en la base local.")
+
+        except Exception as e:
+            st.error(f"Error al procesar el archivo: {e}")
 
 # --- SECCIÓN: GESTOR SEGURO ---
 elif choice == "Gestor Seguro":
