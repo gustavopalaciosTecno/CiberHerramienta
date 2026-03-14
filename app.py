@@ -3,150 +3,239 @@ import socket
 import hashlib
 import random
 import string
+import requests
 
-# Configuración de la página
-st.set_page_config(page_title="CiberHerramienta Básica", layout="wide")
+# --- CONFIGURACIÓN DE LA PÁGINA ---
+st.set_page_config(
+    page_title="CiberHerramienta Educativa - Néstor Gustavo Palacios Meyer",
+    page_icon="🛡️",
+    layout="wide"
+)
+
+# --- CSS PERSONALIZADO ---
+st.markdown("""
+    <style>
+    /* Ajuste de ancho para móviles */
+    @media (max-width: 640px) {
+        [data-testid="stSidebar"] {
+            width: 100vw !important;
+        }
+    }
+
+    /* Texto al lado de las flechas de cierre */
+    [data-testid="stSidebarNavSeparator"] + div button::before {
+        content: "Deslizar acá ⬅️ ";
+        font-size: 14px;
+        color: #808495;
+        margin-right: 10px;
+        vertical-align: middle;
+    }
+
+    /* Asegurar que el logo esté centrado */
+    [data-testid="stSidebar"] [data-testid="stImage"] {
+        text-align: center;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        padding-top: 20px;
+    }
+
+    /* Estilo para los botones */
+    .stButton>button {
+        width: 100%;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
 st.title("🛡️ Panel de Ciberseguridad Educativo")
 st.markdown("---")
 
-# --- BARRA LATERAL (MODIFICADA) ---
-st.sidebar.markdown("### 🖱️ Clic acá para ver las herramientas u opciones") # Título añadido
-menu = ["Inicio", "Escáner de Puertos", "Hash de Archivo", "Gestor Seguro"]
+# --- BARRA LATERAL ---
+st.sidebar.image("https://cdn-icons-png.flaticon.com/512/2092/2092663.png", width=100)
+st.sidebar.markdown("<h3 style='text-align: center;'>Menú de Herramientas</h3>", unsafe_allow_html=True)
+menu = ["Inicio", "Escáner de Puertos", "Auditoría de Cabeceras", "Hash de Archivo", "Gestor Seguro"]
 choice = st.sidebar.selectbox("Selecciona una opción:", menu)
 
-# --- INICIO ---
+st.sidebar.markdown("---")
+st.sidebar.info("🚀 **Desarrollado por:**\nGustavo Palacios Meyer")
+
+# --- SECCIÓN: INICIO ---
 if choice == "Inicio":
-    st.subheader("🤫Bienvenido al panel")
+    st.subheader("🤫 Bienvenido al panel")
+    col1, col2 = st.columns([2, 1])
+    with col1:
+        st.write("""
+        Esta aplicación es una plataforma educativa diseñada para simular y comprender el funcionamiento 
+        de herramientas básicas de ciberseguridad. 
 
-    st.write("Esta app es educativa y simula herramientas básicas de ciberseguridad hecha por Gustavo Palacios Meyer.")
+        **Desarrollado por:** Gustavo Palacios Meyer.
 
-# --- ESCÁNER DE PUERTOS (Simulado/Básico) ---
-# --- ESCÁNER DE PUERTOS (Simulado/Básico) ---
+        ### ¿Qué puedes hacer aquí?
+        * **Analizar Puertos:** Entender qué servicios están expuestos en un servidor.
+        * **Auditar Web:** Verificar si un sitio web utiliza cabeceras de protección modernas.
+        * **Verificar Integridad:** Analizar archivos mediante algoritmos de hashing.
+        * **Seguridad de Acceso:** Generar contraseñas robustas con alta entropía.
+        """)
+    with col2:
+        st.info(
+            "**Nota Educativa:** El uso de estas herramientas contra sistemas sin autorización es ilegal. Úsalas solo en entornos controlados o con permiso.")
+
+# --- SECCIÓN: ESCÁNER DE PUERTOS ---
 elif choice == "Escáner de Puertos":
     st.subheader("🌐 Escáner de Puertos y Riesgos")
-    target = st.text_input("IP o Dominio a escanear", "127.0.0.1")
+    st.write("Esta herramienta intenta conectar con puertos específicos para ver si responden.")
+
+    target = st.text_input("Ingresa IP o Dominio (ej: google.com o 127.0.0.1)", "127.0.0.1")
 
     vulnerable_ports = {
-        21: "FTP (File Transfer Protocol) - Puede permitir acceso anónimo inseguro.",
-        22: "SSH (Secure Shell) - Riesgo de ataques de fuerza bruta.",
-        23: "Telnet - Protocolo obsoleto y NO cifrado.",
-        80: "HTTP - Web no segura (sin cifrado SSL).",
-        445: "SMB (Server Message Block) - Propenso a vulnerabilidades graves (ej. WannaCry)."
+        21: "FTP (Protocolo de Transferencia de Archivos) - Muy propenso a interceptación si no es FTPS.",
+        22: "SSH (Secure Shell) - Es seguro, pero suele recibir ataques de fuerza bruta constantes.",
+        23: "Telnet - ¡Peligro! Envía contraseñas y datos en texto plano.",
+        80: "HTTP - Tráfico web sin cifrar. Se recomienda usar el 443 (HTTPS).",
+        443: "HTTPS - Puerto seguro para navegación web cifrada.",
+        445: "SMB - Utilizado para compartir archivos en red; vulnerable a exploits como WannaCry.",
+        8080: "HTTP Alternativo - Usado comúnmente en servidores de desarrollo o proxies."
     }
 
-    if st.button("Escanear y Analizar"):
+    if st.button("Iniciar Escaneo"):
         try:
-            # Resolución de DNS: Convierte dominio a IP o valida la IP
+            # Resolución de DNS (Funciona para dominios e IPs)
             target_ip = socket.gethostbyname(target)
-            st.info(f"Resolviendo objetivo: **{target}** ➔ **{target_ip}**")
+            st.info(f"Resolviendo objetivo: **{target}** ➔ IP: **{target_ip}**")
 
-            ports_to_scan = [21, 22, 23, 80, 443, 8080, 445]
+            ports_to_scan = [21, 22, 23, 80, 443, 445, 8080]
+            progress_bar = st.progress(0)
 
-            for port in ports_to_scan:
+            for i, port in enumerate(ports_to_scan):
                 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                socket.setdefaulttimeout(0.5)
-                # Usamos la IP resuelta para la conexión
+                socket.setdefaulttimeout(0.6)  # Tiempo de espera para respuesta
                 result = sock.connect_ex((target_ip, port))
 
                 if result == 0:
                     if port in vulnerable_ports:
-                        st.error(f"🚨 **Puerto {port} ABIERTO** - ¡PELIGRO! {vulnerable_ports[port]}")
+                        st.error(f"🚨 **Puerto {port} ABIERTO** - {vulnerable_ports[port]}")
                     else:
-                        st.warning(f"⚠️ **Puerto {port} ABIERTO** - Servicio corriendo.")
+                        st.warning(f"⚠️ **Puerto {port} ABIERTO** - Servicio desconocido detectado.")
                 else:
                     st.write(f"✅ Puerto {port}: Cerrado.")
+
                 sock.close()
+                progress_bar.progress((i + 1) / len(ports_to_scan))
 
         except socket.gaierror:
-            st.error("❌ Error: No se pudo resolver el dominio. Verifica que la dirección sea correcta.")
+            st.error("❌ Error: No se pudo resolver el dominio. Revisa la ortografía o tu conexión.")
         except Exception as e:
-            st.error(f"❌ Ocurrió un error inesperado: {e}")
+            st.error(f"❌ Error inesperado: {e}")
 
-# --- ANÁLISIS DE MALWARE (Simulado por Hashing) ---
-elif choice == "Hash de Archivo":
-    st.subheader("🔍 Análisis de Integridad y Malware")
-    st.write("Calcula el hash SHA256 y verifica si coincide con amenazas conocidas.")
+# --- SECCIÓN: AUDITORÍA DE CABECERAS HTTP ---
+elif choice == "Auditoría de Cabeceras":
+    st.subheader("🛡️ Análisis de Cabeceras de Seguridad")
+    st.write("Analiza si un servidor web implementa medidas de protección contra ataques como XSS o Clickjacking.")
 
-    # 1. Base de datos de ejemplo (Lista Negra)
-    # El hash de EICAR es real, los otros son ejemplos educativos
-    malware_db = {
-        "275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f": "Archivo de prueba EICAR (Seguro)",
-        "24d004a104d4d54034dbcffc2a1c1a3e86c321d3f9e2e604f5f5e3a3f5a1a3b2": "Posible variante de WannaCry",
-        "5f34d658a0873ed782362f688a44d8c6b39d17d52f638848d6139783962657e4": "Trojan.Generic.Ejemplo"
+    url = st.text_input("URL del sitio (debe incluir http:// o https://)", "https://")
+
+    security_headers = {
+        "Content-Security-Policy": "Controla qué recursos puede cargar el navegador, mitigando ataques de Inyección (XSS).",
+        "Strict-Transport-Security": "Fuerza la conexión por HTTPS, evitando ataques de intercepción (Man-in-the-Middle).",
+        "X-Frame-Options": "Protege contra el **Clickjacking** al evitar que el sitio sea embebido en frames ajenos.",
+        "X-Content-Type-Options": "Evita que el navegador 'adivine' el tipo de archivo, mitigando la ejecución de scripts ocultos.",
+        "Referrer-Policy": "Controla cuánta información se comparte al hacer clic en enlaces hacia otros sitios."
     }
 
-    uploaded_file = st.file_uploader("Sube un archivo (.exe, .pdf, .zip, etc.)", type=None)
+    if st.button("Analizar Cabeceras"):
+        if not url.startswith("http"):
+            st.warning("La URL debe comenzar con http:// o https://")
+        else:
+            try:
+                with st.spinner("Analizando respuesta del servidor..."):
+                    response = requests.get(url, timeout=10)
+                    headers = response.headers
+
+                st.write(f"### Resultados para: {url}")
+                st.markdown("---")
+
+                for header, info in security_headers.items():
+                    if header in headers:
+                        st.success(f"✅ **{header}**: Presente")
+                        with st.expander("Ver valor y explicación"):
+                            st.code(headers[header], language="text")
+                            st.write(info)
+                    else:
+                        st.error(f"❌ **{header}**: Faltante")
+                        st.info(f"**¿Por qué es importante?** {info}")
+            except Exception as e:
+                st.error(f"No se pudo conectar con el sitio: {e}")
+
+# --- SECCIÓN: HASH DE ARCHIVO ---
+elif choice == "Hash de Archivo":
+    st.subheader("🔍 Análisis de Integridad (SHA-256)")
+    st.write("Sube un archivo para obtener su huella digital única y compararla con amenazas.")
+
+    malware_db = {
+        "275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f": "Archivo de prueba EICAR (Falso positivo seguro)",
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855": "Archivo vacío (Empty File)"
+    }
+
+    uploaded_file = st.file_uploader("Elige un archivo...")
 
     if uploaded_file is not None:
         file_bytes = uploaded_file.read()
         sha256_hash = hashlib.sha256(file_bytes).hexdigest()
 
-        st.markdown("---")
-        st.write("**Resultado del Análisis:**")
+        st.markdown("### Hash Resultante:")
         st.code(sha256_hash, language="text")
 
-        # 2. Lógica de comparación
         if sha256_hash in malware_db:
-            st.error(f"⚠️ ¡ALERTA! Este archivo coincide con una amenaza conocida: **{malware_db[sha256_hash]}**")
-            st.warning("Se recomienda no ejecutar este archivo y eliminarlo.")
+            st.error(
+                f"🚨 **¡ALERTA!** Este hash coincide con una entrada en nuestra base de datos: {malware_db[sha256_hash]}")
         else:
-            st.success("✅ El hash no coincide con ninguna amenaza en nuestra base de datos local.")
-            st.info(
-                "Nota: Esto no garantiza que el archivo sea 100% seguro, solo que no está en la lista negra actual.")
+            st.success("✅ El archivo no coincide con ninguna amenaza conocida en la base local.")
 
-    # 3. Función extra: Comparar con un hash específico
-    with st.expander("Comparar con un hash manual"):
-        hash_manual = st.text_input("Pega aquí el hash que esperas (ej. de la web oficial)")
-        if hash_manual:
-            if hash_manual.lower() == sha256_hash.lower():
-                st.success("✨ ¡Coincidencia perfecta! El archivo es auténtico.")
-            else:
-                st.error("❌ Los hashes no coinciden. El archivo podría estar modificado.")
-
-# --- GESTOR DE CONTRASEÑAS (Educativo) ---
+# --- SECCIÓN: GESTOR SEGURO ---
+# --- SECCIÓN: GESTOR SEGURO ---
 elif choice == "Gestor Seguro":
-    st.subheader("🛡️ Generador de Contraseñas Seguras")
-    st.write("Crea contraseñas robustas de forma aleatoria sin que salgan de tu navegador.")
+    st.subheader("🛡️ Generador de Contraseñas Robustas")
+    st.write("Configura los parámetros para crear una contraseña con alta entropía.")
 
-    col1, col2 = st.columns(2)
+    col_a, col_b = st.columns(2)
+    with col_a:
+        longitud = st.slider("Longitud de la contraseña", 8, 64, 16)
+        incluir_mayus = st.checkbox("Incluir Mayúsculas (A-Z)", value=True)
+        incluir_minus = st.checkbox("Incluir Minúsculas (a-z)", value=True)
+    with col_b:
+        incluir_nums = st.checkbox("Incluir Números (0-9)", value=True)
+        incluir_simbolos = st.checkbox("Incluir Símbolos (!@#$...)", value=True)
 
-    with col1:
-        longitud = st.slider("Longitud de la contraseña", 8, 32, 16)
-        # Añadimos checkbox de minúsculas para control total
-        incluir_minus = st.checkbox("Incluir Minúsculas", value=True)
-        incluir_mayus = st.checkbox("Incluir Mayúsculas", value=True)
-        incluir_numeros = st.checkbox("Incluir Números", value=True)
-        incluir_especiales = st.checkbox("Incluir Símbolos (!@#$)", value=True)
-
-    # --- Lógica de generación corregida ---
-    caracteres = ""  # Empezamos con la cadena vacía
-
-    if incluir_minus:
-        caracteres += string.ascii_lowercase
-    if incluir_mayus:
-        caracteres += string.ascii_uppercase
-    if incluir_numeros:
-        caracteres += string.digits
-    if incluir_especiales:
-        caracteres += string.punctuation
+    # Construcción del pool de caracteres basada en la selección
+    caracteres_disponibles = ""
+    if incluir_mayus: caracteres_disponibles += string.ascii_uppercase
+    if incluir_minus: caracteres_disponibles += string.ascii_lowercase
+    if incluir_nums: caracteres_disponibles += string.digits
+    if incluir_simbolos: caracteres_disponibles += string.punctuation
 
     if st.button("Generar Contraseña"):
-        # Verificamos que al menos una opción esté seleccionada para evitar error
-        if caracteres == "":
-            st.error("Por favor, selecciona al menos un tipo de carácter.")
+        if not caracteres_disponibles:
+            st.error("❌ Debes seleccionar al menos un tipo de carácter.")
         else:
-            # Generar contraseña aleatoria segura
-            password = ''.join(random.choice(caracteres) for i in range(longitud))
+            # Generación segura
+            password = "".join(random.choice(caracteres_disponibles) for _ in range(longitud))
 
             st.markdown("---")
-            st.write("Tu contraseña generada:")
-            st.code(password, language="text")
+            st.write("### Tu contraseña generada:")
 
-            # Feedback de seguridad
-            if longitud < 12:
-                st.warning("Nivel de seguridad: Débil (se recomiendan al menos 12 caracteres)")
-            elif len(set(caracteres)) < 30:
-                st.info("Nivel de seguridad: Medio (añade más tipos de caracteres)")
+            # El componente st.code ya trae el botón de "copiar" integrado por defecto
+            st.code(password, language="text")
+            st.caption("Usa el botón de la esquina superior derecha del cuadro gris para copiar.")
+
+            # Análisis de seguridad visual
+            if longitud >= 16 and (incluir_mayus + incluir_minus + incluir_nums + incluir_simbolos >= 3):
+                st.success("Nivel de seguridad: **Muy Fuerte** ✅")
+            elif longitud >= 12:
+                st.info("Nivel de seguridad: **Medio**")
             else:
-                st.success("Nivel de seguridad: Fuerte ✅")
+                st.warning("Nivel de seguridad: **Bajo** (se recomienda aumentar la longitud)")
+
+# Pie de página
+st.markdown("---")
+st.caption("Desarrollado para fines académicos. La seguridad es un proceso, no un producto.")
+st.caption("serviciospalaciosweb.com &copy; Derechos Reservados")
