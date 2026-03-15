@@ -28,7 +28,7 @@ def generar_pdf(titulo_reporte, contenido_dict):
     pdf.set_font("Arial", size=10)
     fecha_actual = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
     pdf.cell(200, 10, txt=f"Fecha de análisis: {fecha_actual}", ln=True, align='C')
-    pdf.cell(200, 10, txt="Desarrollado por: Gustavo Palacios Meyer con ayuda íntegramente de IA.", ln=True, align='C')
+    pdf.cell(200, 10, txt="Desarrollado por: Gustavo Palacios Meyer con el apoyo de Inteligencia Artificial.", ln=True, align='C')
     pdf.ln(10)
 
     # Cuerpo
