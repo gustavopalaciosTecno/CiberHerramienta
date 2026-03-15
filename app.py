@@ -87,12 +87,12 @@ if choice == "Inicio":
 
         ### ¿Qué puedes hacer aquí?
         * **Analizar Puertos:** Entender qué servicios están expuestos en un servidor.
-        * **Auditar Web:** Verificar si un sitio web utiliza cabeceras de protección modernas.
-        * Auditoría de inyección XSS
-        * Laboratorio de SQL exclusivamente educativo
-        * **Verificar Integridad:** Analizar archivos mediante algoritmos de hashing.
-        * **Seguridad de Acceso:** Generar contraseñas robustas con alta entropía.
-        * Generar un reporte en formato PDF.
+    * **Auditar Web:** Verificar si un sitio web utiliza cabeceras de protección modernas.
+    * **Auditoría XSS:** Detectar vulnerabilidades de inyección de scripts en parámetros URL.
+    * **Laboratorio SQL:** Aprender a proteger bases de datos contra ataques de inyección (Fines educativos).
+    * **Verificar Integridad:** Analizar archivos mediante algoritmos de hashing.
+    * **Seguridad de Acceso:** Generar contraseñas robustas con alta entropía.
+    * **Reportes Profesionales:** Generar documentos PDF detallados con los resultados del análisis.
         """)
     with col2:
         st.info(
