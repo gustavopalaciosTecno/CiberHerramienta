@@ -33,11 +33,14 @@ def generar_pdf(titulo_reporte, contenido_dict):
 
     # Cuerpo
     pdf.set_font("Arial", size=12)
+    # Dentro de tu función generar_pdf, cambia el bucle por esto:
     for clave, valor in contenido_dict.items():
         pdf.set_font("Arial", 'B', 12)
-        pdf.multi_cell(0, 10, txt=f"{clave}:")
+        pdf.multi_cell(0, 10, txt=str(clave).encode('latin-1', 'replace').decode('latin-1'))
         pdf.set_font("Arial", size=11)
-        pdf.multi_cell(0, 10, txt=f"{valor}")
+        # Limpiamos caracteres que FPDF no soporta bien
+        texto_limpio = str(valor).encode('latin-1', 'replace').decode('latin-1')
+        pdf.multi_cell(0, 10, txt=texto_limpio)
         pdf.ln(2)
 
     pdf.ln(10)
@@ -65,7 +68,7 @@ st.markdown("---")
 # --- BARRA LATERAL ---
 st.sidebar.image("https://cdn-icons-png.flaticon.com/512/2092/2092663.png", width=100)
 st.sidebar.markdown("<h3 style='text-align: center;'>Menú de Herramientas</h3>", unsafe_allow_html=True)
-menu = ["Inicio", "Escáner de Puertos", "Auditoría de Cabeceras", "Hash de Archivo", "Gestor Seguro"]
+menu = ["Inicio", "Escáner de Puertos", "Auditoría de Cabeceras", "Auditoría de Inyección","Laboratorio SQL","Hash de Archivo", "Gestor Seguro"]
 choice = st.sidebar.selectbox("Selecciona una opción:", menu)
 
 st.sidebar.markdown("---")
@@ -187,6 +190,146 @@ elif choice == "Auditoría de Cabeceras":
                                    file_name="cabeceras.pdf")
             except Exception as e:
                 st.error(f"Error: {e}")
+
+# --- SECCIÓN: AUDITORÍA DE INYECCIÓN (XSS) ---
+elif choice == "Auditoría de Inyección":
+    st.subheader("💉 Prueba de Vulnerabilidad XSS (Reflejado)")
+    st.write("""
+    Esta herramienta verifica si un parámetro de una URL (como una búsqueda) es vulnerable a Cross-Site Scripting.
+    **Uso:** Ingresa la URL completa incluyendo el parámetro, por ejemplo: `http://tusitio.com/buscar.php?q=`
+    """)
+
+    target_url = st.text_input("URL del objetivo con parámetro", "http://")
+
+    if st.button("Ejecutar Escaneo de Inyección"):
+        if not target_url.startswith("http"):
+            st.warning("Por favor, ingresa una URL válida que comience con http:// o https://")
+        elif "=" not in target_url:
+            st.error("La URL debe contener un parámetro (ejemplo: ?id= o ?q=) para probar la inyección.")
+        else:
+            try:
+                # Payloads de prueba (scripts inofensivos para detectar vulnerabilidad)
+                payloads = [
+                    "<script>alert('XSS')</script>",
+                    "'\"><script>alert(1)</script>",
+                    "<img src=x onerror=alert('XSS')>"
+                ]
+
+                vulnerable = False
+                resultados_pdf = {"URL Base": target_url}
+
+                # 1. Definimos un User-Agent para que no nos bloqueen por parecer un robot
+                headers = {
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+                }
+                # Aseguramos que la URL no tenga espacios y que termine lista para el payload
+                target_url = target_url.strip()
+                if not target_url.endswith("=") and "=" in target_url:
+                    # Si el usuario puso ?id=123, intentamos inyectar después del valor
+                    pass
+
+                try:
+                    with st.spinner("Probando payloads..."):
+                        for i, payload in enumerate(payloads):
+                            test_url = target_url.strip() + payload
+
+                            # 2. Aumentamos el timeout a 20 segundos y agregamos los headers
+                            response = requests.get(test_url, headers=headers, timeout=20)
+
+                            if payload in response.text:
+                                st.error(f"🚨 **VULNERABILIDAD DETECTADA** con: `{payload}`")
+                                vulnerable = True
+                                break
+                            else:
+                                st.write(f"✅ Prueba {i + 1}: El payload fue filtrado.")
+
+                except requests.exceptions.Timeout:
+                    st.warning(
+                        "⚠️ El servidor tarda demasiado en responder. Es posible que el sitio esté caído o bloqueando la conexión.")
+                except requests.exceptions.ConnectionError:
+                    st.error("❌ Error de conexión. No se pudo establecer contacto con el servidor.")
+                except Exception as e:
+                    st.error(f"Error inesperado: {e}")
+
+                if not vulnerable:
+                    st.success(
+                        "🎉 No se detectaron vulnerabilidades XSS básicas. El sitio parece manejar bien las entradas.")
+                    resultados_pdf["Resultado Final"] = "Seguro"
+                else:
+                    resultados_pdf["Resultado Final"] = "VULNERABLE"
+
+                # Opción de descargar reporte
+                st.markdown("---")
+                pdf_data = generar_pdf("Reporte de Auditoria XSS", resultados_pdf)
+                st.download_button(
+                    label="📥 Descargar Reporte de Inyección",
+                    data=pdf_data,
+                    file_name="auditoria_xss.pdf",
+                    mime="application/pdf"
+                )
+
+            except Exception as e:
+                st.error(f"Error al conectar con el objetivo: {e}")
+
+# --- SECCIÓN: LABORATORIO SQL (EDUCATIVO) ---
+elif choice == "Laboratorio SQL":
+    st.subheader("🗄️ Laboratorio de Inyección SQL y Prevención")
+    st.info("Este módulo es interactivo y educativo. No realiza ataques reales, sino que simula cómo funcionan.")
+
+    st.markdown("""
+    ### 1. La Consulta Vulnerable
+    Imagina que tienes un sistema de login o un buscador de alumnos en PHP con este código:
+    """)
+
+    # Simulación de código vulnerable
+    st.code("""
+// CÓDIGO INSEGURO
+$id = $_GET['id'];
+$query = "SELECT nombre, nota FROM alumnos WHERE id = " . $id;
+    """, language="php")
+
+    st.markdown("---")
+    st.write("### 2. Simular un Ataque")
+    input_usuario = st.text_input("Ingresa un ID de alumno (o intenta una inyección)", "1")
+
+    # Lógica de simulación
+    query_final = f"SELECT nombre, nota FROM alumnos WHERE id = {input_usuario}"
+
+    st.write("**Consulta que se ejecutaría en MySQL:**")
+    st.warning(f"`{query_final}`")
+
+    # Detectar patrones de inyección comunes
+    payloads_sql = ["' OR '1'='1", "UNION SELECT", "DROP TABLE", "--", ";"]
+
+    if any(p in input_usuario for p in payloads_sql):
+        st.error("🚨 **¡Inyección SQL detectada!**")
+        st.write("""
+        **¿Qué pasó?** Al ingresar comillas o comandos SQL, has modificado la lógica original. 
+        Si esto fuera un login, el atacante podría entrar sin contraseña usando `' OR '1'='1`.
+        """)
+
+    else:
+        st.success("Consulta legítima enviada.")
+
+    st.markdown("---")
+    st.markdown("### 3. La Solución Profesional: Sentencias Preparadas (PDO)")
+    st.write("Para proteger tu sistema **SGE**, nunca concatenes variables. Usa este estándar:")
+
+    st.code("""
+// CÓDIGO SEGURO (USANDO PDO)
+$id = $_GET['id'];
+
+// 1. Preparamos la plantilla (con un marcador ?)
+$stmt = $pdo->prepare("SELECT nombre, nota FROM alumnos WHERE id = ?");
+
+// 2. Ejecutamos pasando el dato por separado
+$stmt->execute([$id]);
+
+$resultado = $stmt->fetch();
+    """, language="php")
+
+    st.success(
+        "✅ Con este método, el motor de base de datos trata la entrada como **texto**, no como código ejecutable.")
 
 # --- SECCIÓN: HASH DE ARCHIVO (CORREGIDA) ---
 elif choice == "Hash de Archivo":
