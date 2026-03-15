@@ -88,8 +88,8 @@ if choice == "Inicio":
         ### ¿Qué puedes hacer aquí?
         * **Analizar Puertos:** Entender qué servicios están expuestos en un servidor.
         * **Auditar Web:** Verificar si un sitio web utiliza cabeceras de protección modernas.
-        * **Auditoría de inyección XSS
-        * **Laboratorio de SQL exclusivamente educativo
+        * Auditoría de inyección XSS
+        * Laboratorio de SQL exclusivamente educativo
         * **Verificar Integridad:** Analizar archivos mediante algoritmos de hashing.
         * **Seguridad de Acceso:** Generar contraseñas robustas con alta entropía.
         * Generar un reporte en formato PDF.
