@@ -68,7 +68,7 @@ st.markdown("---")
 # --- BARRA LATERAL ---
 st.sidebar.image("https://cdn-icons-png.flaticon.com/512/2092/2092663.png", width=100)
 st.sidebar.markdown("<h3 style='text-align: center;'>Menú de Herramientas</h3>", unsafe_allow_html=True)
-menu = ["Inicio", "Escáner de Puertos", "Auditoría de Cabeceras", "Auditoría de Inyección","Laboratorio SQL","Hash de Archivo", "Gestor Seguro"]
+menu = ["Inicio", "Escáner de Puertos", "Auditoría de Cabeceras", "Auditoría de Inyección","Laboratorio SQL","Escáner de Directorios","Hash de Archivo", "Gestor Seguro"]
 choice = st.sidebar.selectbox("Selecciona una opción:", menu)
 
 st.sidebar.markdown("---")
@@ -104,6 +104,7 @@ if choice == "Inicio":
         * **Auditoría XSS:** Detectar vulnerabilidades de inyección de scripts en parámetros URL.
         * **Laboratorio SQL:** Aprender a proteger bases de datos contra ataques de inyección (Fines educativos).
         * **Verificar Integridad:** Analizar archivos mediante algoritmos de hashing.
+        * **Escáner de Directorios Sensibles:** El "Fuzzing" o enumeración de directorios consiste en probar mediante "fuerza bruta" una lista de nombres de carpetas conocidos para ver cuáles responden.
         * **Seguridad de Acceso:** Generar contraseñas robustas con alta entropía.
         * **Reportes Profesionales:** Generar documentos PDF detallados con los resultados del análisis.
         """)
@@ -345,6 +346,66 @@ $resultado = $stmt->fetch();
 
     st.success(
         "✅ Con este método, el motor de base de datos trata la entrada como **texto**, no como código ejecutable.")
+
+# --- SECCIÓN: ESCÁNER DE DIRECTORIOS (FUZZING BÁSICO) ---
+elif choice == "Escáner de Directorios":
+    st.subheader("📁 Escáner de Directorios Sensibles")
+    st.write("Esta herramienta busca rutas comunes que podrían exponer información crítica del servidor.")
+
+    target_web = st.text_input("Ingresa la URL base (ej: https://tusitio.com)", "https://")
+
+    if st.button("Iniciar Escaneo de Rutas"):
+        if not target_web.startswith("http"):
+            st.error("Por favor, ingresa una URL válida.")
+        else:
+            # Lista de rutas críticas a buscar
+            rutas_sensibles = [
+                "/.env", "/config.php", "/wp-config.php", "/.git/",
+                "/backup.sql", "/db.sql", "/admin/", "/phpmyadmin/",
+                "/.htaccess", "/server-status", "/robots.txt", "/api/v1/"
+            ]
+
+            encontrados = []
+            headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
+
+            with st.spinner("Escaneando directorios..."):
+                barra_progreso = st.progress(0)
+
+                for i, ruta in enumerate(rutas_sensibles):
+                    url_final = target_web.rstrip('/') + ruta
+                    try:
+                        # Usamos allow_redirects=False para evitar falsos positivos de redirección
+                        response = requests.get(url_final, headers=headers, timeout=5, allow_redirects=False)
+
+                        # Si el código es 200 (OK) o 403 (Forbidden), el directorio existe
+                        if response.status_code == 200:
+                            st.warning(f"⚠️ **Encontrado (Público):** {ruta} (Código: 200)")
+                            encontrados.append(f"{ruta} - Abierto")
+                        elif response.status_code == 403:
+                            st.info(f"🔒 **Detectado (Protegido):** {ruta} (Código: 403)")
+                            encontrados.append(f"{ruta} - Prohibido/Protegido")
+
+                    except Exception:
+                        pass
+
+                    # Actualizar barra de progreso
+                    progreso = (i + 1) / len(rutas_sensibles)
+                    barra_progreso.progress(progreso)
+
+            st.markdown("---")
+            if encontrados:
+                st.success(f"Escaneo finalizado. Se detectaron {len(encontrados)} rutas de interés.")
+            else:
+                st.success("🎉 No se encontraron directorios sensibles comunes expuestos.")
+
+            # Integración con el reporte PDF
+            resultados_dir = {"URL": target_web,
+                              "Rutas Detectadas": ", ".join(encontrados) if encontrados else "Ninguna"}
+            pdf_data = generar_pdf("Reporte de Escaneo de Directorios", resultados_dir)
+            st.download_button("📥 Descargar Reporte de Directorios", pdf_data, "auditoria_directorios.pdf",
+                               "application/pdf")
+
+
 
 # --- SECCIÓN: HASH DE ARCHIVO (CORREGIDA) ---
 elif choice == "Hash de Archivo":
