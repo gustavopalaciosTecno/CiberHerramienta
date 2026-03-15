@@ -83,7 +83,7 @@ if choice == "Inicio":
         Esta aplicación es una plataforma educativa diseñada para simular y comprender el funcionamiento 
         de herramientas básicas de ciberseguridad. 
 
-        **Desarrollado por:** Gustavo Palacios Meyer.
+        Desarrollado por: Gustavo Palacios Meyer.
 
         ### ¿Qué puedes hacer aquí?
     * **Analizar Puertos:** Entender qué servicios están expuestos en un servidor.
