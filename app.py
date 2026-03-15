@@ -86,7 +86,7 @@ if choice == "Inicio":
         **Desarrollado por:** Gustavo Palacios Meyer.
 
         ### ¿Qué puedes hacer aquí?
-        * **Analizar Puertos:** Entender qué servicios están expuestos en un servidor.
+    * **Analizar Puertos:** Entender qué servicios están expuestos en un servidor.
     * **Auditar Web:** Verificar si un sitio web utiliza cabeceras de protección modernas.
     * **Auditoría XSS:** Detectar vulnerabilidades de inyección de scripts en parámetros URL.
     * **Laboratorio SQL:** Aprender a proteger bases de datos contra ataques de inyección (Fines educativos).
