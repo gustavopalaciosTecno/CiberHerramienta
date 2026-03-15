@@ -375,12 +375,17 @@ elif choice == "Escáner de Directorios":
                     url_final = target_web.rstrip('/') + ruta
                     try:
                         # Usamos allow_redirects=False para evitar falsos positivos de redirección
+                        # Lógica mejorada para evitar falsos positivos
                         response = requests.get(url_final, headers=headers, timeout=5, allow_redirects=False)
 
-                        # Si el código es 200 (OK) o 403 (Forbidden), el directorio existe
                         if response.status_code == 200:
-                            st.warning(f"⚠️ **Encontrado (Público):** {ruta} (Código: 200)")
-                            encontrados.append(f"{ruta} - Abierto")
+                            # Si el archivo termina en .php y la respuesta está vacía, es normal (está protegido)
+                            if url_final.endswith(".php") and len(response.text.strip()) == 0:
+                                st.info(
+                                    f"inner_safe_check_mark: **Procesado correctamente:** {ruta} (No hay fuga de texto)")
+                            else:
+                                st.warning(f"⚠️ **Encontrado (Público):** {ruta}")
+                                encontrados.append(f"{ruta} - Expuesto (200)")
                         elif response.status_code == 403:
                             st.info(f"🔒 **Detectado (Protegido):** {ruta} (Código: 403)")
                             encontrados.append(f"{ruta} - Prohibido/Protegido")
