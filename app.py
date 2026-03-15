@@ -79,20 +79,33 @@ if choice == "Inicio":
     st.subheader("🤫 Bienvenido al panel")
     col1, col2 = st.columns([2, 1])
     with col1:
-        st.write("""
-        Esta aplicación es una plataforma educativa diseñada para simular y comprender el funcionamiento 
-        de herramientas básicas de ciberseguridad. 
+        # Usamos HTML con CSS para bloquear la selección y copia
+        st.markdown("""
+            <div style="
+                user-select: none; 
+                -webkit-user-select: none; 
+                -moz-user-select: none; 
+                -ms-user-select: none;
+                border: 1px solid #4a4a4a;
+                padding: 15px;
+                border-radius: 10px;
+                background-color: rgba(255, 255, 255, 0.05);
+                margin-bottom: 20px;
+            ">
+                <p style="margin-bottom: 0;">Desarrollado por: Gustavo Palacios Meyer.</p>
+            </div>
 
-        Desarrollado por: Gustavo Palacios Meyer.
+            <h3 style="user-select: none;">¿Qué puedes hacer aquí?</h3>
+        """, unsafe_allow_html=True)
 
-        ### ¿Qué puedes hacer aquí?
-    * **Analizar Puertos:** Entender qué servicios están expuestos en un servidor.
-    * **Auditar Web:** Verificar si un sitio web utiliza cabeceras de protección modernas.
-    * **Auditoría XSS:** Detectar vulnerabilidades de inyección de scripts en parámetros URL.
-    * **Laboratorio SQL:** Aprender a proteger bases de datos contra ataques de inyección (Fines educativos).
-    * **Verificar Integridad:** Analizar archivos mediante algoritmos de hashing.
-    * **Seguridad de Acceso:** Generar contraseñas robustas con alta entropía.
-    * **Reportes Profesionales:** Generar documentos PDF detallados con los resultados del análisis.
+        st.markdown("""
+        * **Analizar Puertos:** Entender qué servicios están expuestos en un servidor.
+        * **Auditar Web:** Verificar si un sitio web utiliza cabeceras de protección modernas.
+        * **Auditoría XSS:** Detectar vulnerabilidades de inyección de scripts en parámetros URL.
+        * **Laboratorio SQL:** Aprender a proteger bases de datos contra ataques de inyección (Fines educativos).
+        * **Verificar Integridad:** Analizar archivos mediante algoritmos de hashing.
+        * **Seguridad de Acceso:** Generar contraseñas robustas con alta entropía.
+        * **Reportes Profesionales:** Generar documentos PDF detallados con los resultados del análisis.
         """)
     with col2:
         st.info(
