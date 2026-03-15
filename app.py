@@ -74,7 +74,7 @@ choice = st.sidebar.selectbox("Selecciona una opción:", menu)
 st.sidebar.markdown("---")
 st.sidebar.info("🚀 **Desarrollado por:**\nGustavo Palacios Meyer con la ayuda de la Inteligencia Artificial")
 
-# --- SECCIÓN: INICIO ---
+# --- SECCIÓN: INICIO NUEVO---
 if choice == "Inicio":
     st.subheader("🤫 Bienvenido al panel")
     col1, col2 = st.columns([2, 1])
