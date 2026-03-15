@@ -72,7 +72,7 @@ menu = ["Inicio", "Escáner de Puertos", "Auditoría de Cabeceras", "Auditoría 
 choice = st.sidebar.selectbox("Selecciona una opción:", menu)
 
 st.sidebar.markdown("---")
-st.sidebar.info("🚀 **Desarrollado por:**\nGustavo Palacios Meyer")
+st.sidebar.info("🚀 **Desarrollado por:**\nGustavo Palacios Meyer con la ayuda de la Inteligencia Artificial")
 
 # --- SECCIÓN: INICIO ---
 if choice == "Inicio":
