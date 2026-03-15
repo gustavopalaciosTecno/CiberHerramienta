@@ -107,6 +107,7 @@ if choice == "Inicio":
         * **Verificar Integridad:** Analizar archivos mediante algoritmos de hashing.
         * **Escáner de Directorios Sensibles:** El "Fuzzing" o enumeración de directorios consiste en probar mediante "fuerza bruta" una lista de nombres de carpetas conocidos para ver cuáles responden.
         * **Seguridad de Acceso:** Generar contraseñas robustas con alta entropía.
+        * **Decodificador de direcciones IP maliciosas:** Revela IPs ocultas tras formatos Hex/Octal.
         * **Reportes Profesionales:** Generar documentos PDF detallados con los resultados del análisis.
         """)
     with col2:
