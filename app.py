@@ -379,16 +379,24 @@ elif choice == "Escáner de Directorios":
                         response = requests.get(url_final, headers=headers, timeout=5, allow_redirects=False)
 
                         if response.status_code == 200:
-                            # Si el archivo termina en .php y la respuesta está vacía, es normal (está protegido)
-                            if url_final.endswith(".php") and len(response.text.strip()) == 0:
-                                st.info(
-                                    f"inner_safe_check_mark: **Procesado correctamente:** {ruta} (No hay fuga de texto)")
+                            # 1. Caso: robots.txt (Informativo)
+                            if "robots.txt" in url_final:
+                                st.info(f"🤖 **Archivo de Rastreo:** {ruta} (Público por diseño)")
+                                # No solemos sumarlo a 'encontrados' de vulnerabilidades, pero puedes si quieres
+
+                            # 2. Caso: Archivos PHP vacíos (Seguros)
+                            elif url_final.endswith(".php") and len(response.text.strip()) == 0:
+                                st.info(f"✅ **Procesado correctamente:** {ruta} (No hay fuga de texto)")
+
+                            # 3. Caso: Redirecciones al inicio (Falsos Positivos)
+                            elif response.url.rstrip('/') == target_web.rstrip('/'):
+                                # Si el servidor te mandó a la home, ignoramos el resultado
+                                pass
+
+                            # 4. Caso: Vulnerabilidad Real (Expuesto)
                             else:
                                 st.warning(f"⚠️ **Encontrado (Público):** {ruta}")
                                 encontrados.append(f"{ruta} - Expuesto (200)")
-                        elif response.status_code == 403:
-                            st.info(f"🔒 **Detectado (Protegido):** {ruta} (Código: 403)")
-                            encontrados.append(f"{ruta} - Prohibido/Protegido")
 
                     except Exception:
                         pass
