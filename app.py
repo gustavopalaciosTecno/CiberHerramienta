@@ -4,6 +4,8 @@ import hashlib
 import random
 import string
 import requests
+from fpdf import FPDF
+from datetime import datetime
 
 # --- CONFIGURACIÓN DE LA PÁGINA ---
 st.set_page_config(
@@ -12,38 +14,48 @@ st.set_page_config(
     layout="wide"
 )
 
+
+# --- FUNCIÓN PARA GENERAR PDF ---
+def generar_pdf(titulo_reporte, contenido_dict):
+    pdf = FPDF()
+    pdf.add_page()
+
+    # Encabezado
+    pdf.set_font("Arial", 'B', 16)
+    pdf.cell(200, 10, txt=titulo_reporte, ln=True, align='C')
+
+    # Metadatos
+    pdf.set_font("Arial", size=10)
+    fecha_actual = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+    pdf.cell(200, 10, txt=f"Fecha de análisis: {fecha_actual}", ln=True, align='C')
+    pdf.cell(200, 10, txt="Desarrollado por: Gustavo Palacios Meyer", ln=True, align='C')
+    pdf.ln(10)
+
+    # Cuerpo
+    pdf.set_font("Arial", size=12)
+    for clave, valor in contenido_dict.items():
+        pdf.set_font("Arial", 'B', 12)
+        pdf.multi_cell(0, 10, txt=f"{clave}:")
+        pdf.set_font("Arial", size=11)
+        pdf.multi_cell(0, 10, txt=f"{valor}")
+        pdf.ln(2)
+
+    pdf.ln(10)
+    pdf.set_font("Arial", 'I', 8)
+    pdf.cell(0, 10, txt="serviciospalaciosweb.com - Fin Educativo", ln=True, align='C')
+
+    return pdf.output(dest='S').encode('latin-1')
+
+
 # --- CSS PERSONALIZADO ---
 st.markdown("""
     <style>
-    /* Ajuste de ancho para móviles */
-    @media (max-width: 640px) {
-        [data-testid="stSidebar"] {
-            width: 100vw !important;
-        }
-    }
-
-    /* Texto al lado de las flechas de cierre */
+    @media (max-width: 640px) { [data-testid="stSidebar"] { width: 100vw !important; } }
     [data-testid="stSidebarNavSeparator"] + div button::before {
-        content: "Deslizar acá ⬅️ ";
-        font-size: 14px;
-        color: #808495;
-        margin-right: 10px;
-        vertical-align: middle;
+        content: "Deslizar acá ⬅️ "; font-size: 14px; color: #808495; margin-right: 10px; vertical-align: middle;
     }
-
-    /* Asegurar que el logo esté centrado */
-    [data-testid="stSidebar"] [data-testid="stImage"] {
-        text-align: center;
-        display: block;
-        margin-left: auto;
-        margin-right: auto;
-        padding-top: 20px;
-    }
-
-    /* Estilo para los botones */
-    .stButton>button {
-        width: 100%;
-    }
+    [data-testid="stSidebar"] [data-testid="stImage"] { text-align: center; display: block; margin: 20px auto 0; }
+    .stButton>button { width: 100%; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -75,121 +87,113 @@ if choice == "Inicio":
         * **Auditar Web:** Verificar si un sitio web utiliza cabeceras de protección modernas.
         * **Verificar Integridad:** Analizar archivos mediante algoritmos de hashing.
         * **Seguridad de Acceso:** Generar contraseñas robustas con alta entropía.
+        * Generar un reporte en formato PDF.
         """)
     with col2:
         st.info(
             "**Nota Educativa:** El uso de estas herramientas contra sistemas sin autorización es ilegal. Úsalas solo en entornos controlados o con permiso.")
 
-# --- SECCIÓN: ESCÁNER DE PUERTOS ---
+# --- SECCIÓN: ESCÁNER DE PUERTOS (CON EXPLICACIONES EDUCATIVAS) ---
 elif choice == "Escáner de Puertos":
     st.subheader("🌐 Escáner de Puertos y Riesgos")
-    st.write("Esta herramienta intenta conectar con puertos específicos para ver si responden.")
 
-    # Cambiamos el placeholder para indicar que acepta URLs completas
-    target_input = st.text_input("Ingresa IP, Dominio o URL completa", "127.0.0.1")
-
-    vulnerable_ports = {
-        21: "FTP (Protocolo de Transferencia de Archivos) - Muy propenso a interceptación si no es FTPS.",
-        22: "SSH (Secure Shell) - Es seguro, pero suele recibir ataques de fuerza bruta constantes.",
-        23: "Telnet - ¡Peligro! Envía contraseñas y datos en texto plano.",
-        80: "HTTP - Tráfico web sin cifrar. Se recomienda usar el 443 (HTTPS).",
-        443: "HTTPS - Puerto seguro para navegación web cifrada.",
-        445: "SMB - Utilizado para compartir archivos en red; vulnerable a exploits como WannaCry.",
-        8080: "HTTP Alternativo - Usado comúnmente en servidores de desarrollo o proxies."
+    # Diccionario de referencia para las explicaciones
+    explicaciones_puertos = {
+        21: "FTP - Transferencia de archivos. Si no está cifrado (FTPS), las credenciales viajan en texto plano y pueden ser interceptadas.",
+        22: "SSH - Acceso remoto seguro. Es el estándar, pero suele recibir ataques constantes de fuerza bruta.",
+        23: "Telnet - Comunicación obsoleta y no cifrada. ¡Extremadamente inseguro!",
+        80: "HTTP - Tráfico web sin cifrar. Cualquier dato enviado es visible. Se recomienda migrar al puerto 443.",
+        443: "HTTPS - Tráfico web cifrado. Es el puerto más seguro y estándar para navegación moderna.",
+        445: "SMB - Compartición de archivos en Windows. Si está expuesto a internet, es muy vulnerable a exploits (como WannaCry).",
+        8080: "HTTP Proxy/Alternativo - Comúnmente usado en servidores de desarrollo o paneles de administración."
     }
+
+    target_input = st.text_input("Ingresa IP, Dominio o URL completa", "127.0.0.1")
 
     if st.button("Iniciar Escaneo"):
         try:
-            # --- LÓGICA DE LIMPIEZA DE URL ---
-            # 1. Quitamos el protocolo (http:// o https://) si existe
-            clean_target = target_input.replace("https://", "").replace("http://", "")
-            # 2. Quitamos todo lo que venga después de la primera barra (rutas, parámetros)
-            clean_target = clean_target.split('/')[0]
-            # 3. Quitamos posibles espacios en blanco
-            clean_target = clean_target.strip()
-
-            # Resolución de DNS usando el objetivo limpio
+            # Limpieza de la URL
+            clean_target = target_input.replace("https://", "").replace("http://", "").split('/')[0].strip()
             target_ip = socket.gethostbyname(clean_target)
+            st.info(f"Objetivo detectado: **{clean_target}** (IP: {target_ip})")
 
-            st.info(f"Objetivo detectado: **{clean_target}** ➔ IP: **{target_ip}**")
+            puertos = [21, 22, 23, 80, 443, 445, 8080]
+            resultados_pdf = {"Objetivo": clean_target, "IP": target_ip}
 
-            ports_to_scan = [21, 22, 23, 80, 443, 445, 8080]
+            # Añadimos una barra de progreso para mejorar la experiencia
             progress_bar = st.progress(0)
 
-            for i, port in enumerate(ports_to_scan):
+            for i, port in enumerate(puertos):
                 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                socket.setdefaulttimeout(0.6)
+                socket.setdefaulttimeout(0.7)  # Tiempo de espera para la respuesta
                 result = sock.connect_ex((target_ip, port))
 
+                # Buscamos la explicación en nuestro diccionario
+                info_puerto = explicaciones_puertos.get(port, "Servicio desconocido o personalizado.")
+
                 if result == 0:
-                    if port in vulnerable_ports:
-                        st.error(f"🚨 **Puerto {port} ABIERTO** - {vulnerable_ports[port]}")
-                    else:
-                        st.warning(f"⚠️ **Puerto {port} ABIERTO** - Servicio desconocido detectado.")
+                    # Puerto Abierto
+                    estado_texto = f"ABIERTO - {info_puerto}"
+                    st.error(f"🚨 **Puerto {port}: ABIERTO**\n\n_{info_puerto}_")
                 else:
-                    st.write(f"✅ Puerto {port}: Cerrado.")
+                    # Puerto Cerrado
+                    estado_texto = "Cerrado"
+                    st.write(f"✅ Puerto {port}: Cerrado")
+
+                # Guardamos la información detallada para el PDF
+                resultados_pdf[f"Puerto {port}"] = estado_texto
 
                 sock.close()
-                progress_bar.progress((i + 1) / len(ports_to_scan))
+                progress_bar.progress((i + 1) / len(puertos))
+
+            st.markdown("---")
+            # Generamos el PDF con las descripciones incluidas
+            pdf_data = generar_pdf("Reporte de Auditoría de Puertos", resultados_pdf)
+            st.download_button(
+                label="📥 Descargar Reporte PDF Detallado",
+                data=pdf_data,
+                file_name=f"auditoria_puertos_{clean_target}.pdf",
+                mime="application/pdf"
+            )
 
         except socket.gaierror:
-            st.error(
-                "❌ Error: No se pudo resolver la dirección. Asegúrate de que el dominio o IP sean válidos (sin rutas ni carpetas).")
+            st.error("❌ No se pudo resolver el dominio. Verifica la dirección ingresada.")
         except Exception as e:
-            st.error(f"❌ Error inesperado: {e}")
+            st.error(f"Error inesperado: {e}")
 
-# --- SECCIÓN: AUDITORÍA DE CABECERAS HTTP ---
+# --- SECCIÓN: AUDITORÍA DE CABECERAS ---
 elif choice == "Auditoría de Cabeceras":
     st.subheader("🛡️ Análisis de Cabeceras de Seguridad")
-    st.write("Analiza si un servidor web implementa medidas de protección contra ataques como XSS o Clickjacking.")
-
-    url = st.text_input("URL del sitio (debe incluir http:// o https://)", "https://")
-
-    security_headers = {
-        "Content-Security-Policy": "Controla qué recursos puede cargar el navegador, mitigando ataques de Inyección (XSS).",
-        "Strict-Transport-Security": "Fuerza la conexión por HTTPS, evitando ataques de intercepción (Man-in-the-Middle).",
-        "X-Frame-Options": "Protege contra el **Clickjacking** al evitar que el sitio sea embebido en frames ajenos.",
-        "X-Content-Type-Options": "Evita que el navegador 'adivine' el tipo de archivo, mitigando la ejecución de scripts ocultos.",
-        "Referrer-Policy": "Controla cuánta información se comparte al hacer clic en enlaces hacia otros sitios."
-    }
+    url = st.text_input("URL (con http/https)", "https://")
 
     if st.button("Analizar Cabeceras"):
-        if not url.startswith("http"):
-            st.warning("La URL debe comenzar con http:// o https://")
-        else:
+        if url.startswith("http"):
             try:
-                with st.spinner("Analizando respuesta del servidor..."):
-                    response = requests.get(url, timeout=10)
-                    headers = response.headers
+                response = requests.get(url, timeout=10)
+                headers = response.headers
+                h_interes = ["Content-Security-Policy", "Strict-Transport-Security", "X-Frame-Options",
+                             "X-Content-Type-Options"]
+                resultados_pdf = {"URL": url}
 
-                st.write(f"### Resultados para: {url}")
-                st.markdown("---")
-
-                for header, info in security_headers.items():
-                    if header in headers:
-                        st.success(f"✅ **{header}**: Presente")
-                        with st.expander("Ver valor y explicación"):
-                            st.code(headers[header], language="text")
-                            st.write(info)
+                for h in h_interes:
+                    val = headers.get(h, "FALTANTE")
+                    resultados_pdf[h] = val
+                    if val != "FALTANTE":
+                        st.success(f"✅ {h}")
                     else:
-                        st.error(f"❌ **{header}**: Faltante")
-                        st.info(f"**¿Por qué es importante?** {info}")
-            except Exception as e:
-                st.error(f"No se pudo conectar con el sitio: {e}")
+                        st.error(f"❌ {h}")
 
-# --- SECCIÓN: HASH DE ARCHIVO ---
-# --- SECCIÓN: HASH DE ARCHIVO ---
+                st.download_button("📥 Descargar Reporte PDF", data=generar_pdf("Auditoria Web", resultados_pdf),
+                                   file_name="cabeceras.pdf")
+            except Exception as e:
+                st.error(f"Error: {e}")
+
+# --- SECCIÓN: HASH DE ARCHIVO (CORREGIDA) ---
 elif choice == "Hash de Archivo":
     st.subheader("🔍 Análisis de Integridad (SHA-256)")
 
-    # Tip de ayuda para prevenir el AxiosError: Network Error
     with st.expander("💡 ¿Problemas al subir archivos?"):
-        st.info("""
-        Si experimentas errores al arrastrar (Network Error):
-        * Usa el botón **'Browse files'** en lugar de arrastrar.
-        * Intenta abrir la app en **Modo Incógnito**.
-        * Desactiva bloqueadores de anuncios (AdBlock).
-        """)
+        st.info("Usa 'Browse files' o modo incógnito si el 'Drag & Drop' falla por errores de red.")
 
     st.write("Sube un archivo para obtener su huella digital única y compararla con amenazas.")
 
@@ -198,22 +202,47 @@ elif choice == "Hash de Archivo":
         "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855": "Archivo vacío (Empty File)"
     }
 
-    uploaded_file = st.file_uploader("Elige un archivo...", type=None)
+    uploaded_file = st.file_uploader("Elige un archivo...", type=None, key="hash_uploader")
 
     if uploaded_file is not None:
         try:
+            # 1. PRIMERO calculamos el hash
             with st.spinner("Calculando huella digital..."):
-                file_bytes = uploaded_file.read()
+                file_bytes = uploaded_file.getvalue()
                 sha256_hash = hashlib.sha256(file_bytes).hexdigest()
 
-            st.markdown("### Hash Resultante (SHA-256):")
+            # 2. AHORA que tenemos 'sha256_hash', mostramos los resultados y el link
+            st.markdown("### Resultado del Análisis:")
+            st.info(f"**Nombre:** {uploaded_file.name}")
             st.code(sha256_hash, language="text")
 
+            # Link a VirusTotal usando el hash ya calculado
+            st.markdown(f"### [🔍 Consultar este Hash en VirusTotal](https://www.virustotal.com/gui/file/{sha256_hash})")
+            st.caption("Verifica si este archivo ha sido analizado por motores de seguridad globales.")
+
+            # 3. Verificación en base de datos local
             if sha256_hash in malware_db:
-                st.error(
-                    f"🚨 **¡ALERTA!** Este hash coincide con una entrada en nuestra base de datos: {malware_db[sha256_hash]}")
+                st.error(f"🚨 **¡ALERTA!** Este hash coincide con: {malware_db[sha256_hash]}")
+                estado_seguridad = f"ALERTA: Coincide con {malware_db[sha256_hash]}"
             else:
                 st.success("✅ El archivo no coincide con ninguna amenaza conocida en la base local.")
+                estado_seguridad = "Seguro (Sin coincidencias en base local)"
+
+            # 4. Reporte PDF
+            resultados_pdf = {
+                "Archivo": uploaded_file.name,
+                "Tamaño (Bytes)": len(file_bytes),
+                "Hash SHA-256": sha256_hash,
+                "Resultado": estado_seguridad
+            }
+
+            pdf_data = generar_pdf("Reporte de Integridad de Archivo", resultados_pdf)
+            st.download_button(
+                label="📥 Descargar Reporte PDF",
+                data=pdf_data,
+                file_name=f"analisis_{uploaded_file.name}.pdf",
+                mime="application/pdf"
+            )
 
         except Exception as e:
             st.error(f"Error al procesar el archivo: {e}")
