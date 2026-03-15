@@ -1,5 +1,6 @@
 import streamlit as st
 import socket
+import struct
 import hashlib
 import random
 import string
@@ -68,7 +69,7 @@ st.markdown("---")
 # --- BARRA LATERAL ---
 st.sidebar.image("https://cdn-icons-png.flaticon.com/512/2092/2092663.png", width=100)
 st.sidebar.markdown("<h3 style='text-align: center;'>Menú de Herramientas</h3>", unsafe_allow_html=True)
-menu = ["Inicio", "Escáner de Puertos", "Auditoría de Cabeceras", "Auditoría de Inyección","Laboratorio SQL","Escáner de Directorios","Hash de Archivo", "Gestor Seguro"]
+menu = ["Inicio", "Escáner de Puertos", "Auditoría de Cabeceras", "Auditoría de Inyección","Laboratorio SQL","Escáner de Directorios","Hash de Archivo","Decodificador de IPs","Gestor Seguro"]
 choice = st.sidebar.selectbox("Selecciona una opción:", menu)
 
 st.sidebar.markdown("---")
@@ -478,6 +479,42 @@ elif choice == "Hash de Archivo":
 
         except Exception as e:
             st.error(f"Error al procesar el archivo: {e}")
+
+# --- SECCIÓN: DECODIFICADOR DE REDES ---
+elif choice == "Decodificador de IPs":
+    st.subheader("🕵️‍♂️ Decodificador de IPs Ofuscadas")
+    st.write(
+        "Esta herramienta revela la IP real detrás de direcciones ofuscadas en formato Hexadecimal, Octal o Decimal (técnicas comunes en Phishing).")
+
+    url_ofuscada = st.text_input("Ingresa la URL o IP sospechosa:", placeholder="Ej: 185.0xC1.0x59.0x9E")
+
+    if st.button("Revelar IP Real"):
+        if url_ofuscada:
+            try:
+                # Limpiamos la entrada: quitamos el protocolo y las rutas
+                # Ej: http://185.0xC1.0x59.0x9E/reboot.pl -> 185.0xC1.0x59.0x9E
+                host_sucio = url_ofuscada.replace("https://", "").replace("http://", "").split('/')[0]
+
+                # socket.inet_aton convierte formatos mixtos (hex, oct, dec) a binario automáticamente
+                import socket
+
+                ip_binaria = socket.inet_aton(host_sucio)
+                ip_real = socket.inet_ntoa(ip_binaria)
+
+                st.success(f"📍 **IP Real Detectada:** `{ip_real}`")
+
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.info(f"🔍 [Analizar en VirusTotal](https://www.virustotal.com/gui/ip-address/{ip_real})")
+                with col2:
+                    st.info(f"🌎 [Geolocalizar IP](https://ipinfo.io/{ip_real})")
+
+            except Exception as e:
+                st.error(f"No se pudo decodificar la dirección. Error: {e}")
+        else:
+            st.warning("Por favor, ingresa una dirección para analizar.")
+
+# ---------------------------------------
 
 # --- SECCIÓN: GESTOR SEGURO ---
 elif choice == "Gestor Seguro":
