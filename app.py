@@ -92,7 +92,7 @@ if choice == "Inicio":
                 background-color: rgba(255, 255, 255, 0.05);
                 margin-bottom: 20px;
             ">
-                <p style="margin-bottom: 0;">Desarrollado por: Gustavo Palacios Meyer.</p>
+                <p style="margin-bottom: 0;">Desarrollado por: Gustavo Palacios Meyer con la ayuda de la Inteligencia Artificial.</p>
             </div>
 
             <h3 style="user-select: none;">¿Qué puedes hacer aquí?</h3>
