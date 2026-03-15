@@ -448,7 +448,21 @@ elif choice == "Gestor Seguro":
             else:
                 st.warning("Nivel de seguridad: **Bajo** (se recomienda aumentar la longitud)")
 
-# Pie de página
+# --- PIE DE PÁGINA (FOOTER) ---
 st.markdown("---")
-st.caption("Desarrollado para fines académicos. La seguridad es un proceso, no un producto.")
-st.caption("serviciospalaciosweb.com &copy; Derechos Reservados")
+st.markdown(
+    """
+    <div style="
+        text-align: center; 
+        user-select: none; 
+        color: #7d7d7d; 
+        font-size: 14px;
+        padding: 20px;
+    ">
+        © 2026 - <b>Servicios Palacios Web</b><br>
+        Desarrollado con ❤️ en Charata, Chaco, Argentina.<br>
+        <i>Enfocados en la seguridad y eficiencia de sistemas educativos.</i>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
