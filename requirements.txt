@@ -2,3 +2,5 @@ streamlit
 python-nmap
 requests
 fpdf
+dnspython
+python-whois
