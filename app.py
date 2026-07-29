@@ -10,9 +10,29 @@ from datetime import datetime
 import json
 import base64
 import re
-import dns.resolver
-import whois
 from urllib.parse import urlparse
+
+# --- VERIFICACIÓN DE DEPENDENCIAS OPCIONALES ---
+try:
+    import dns.resolver
+    DNS_AVAILABLE = True
+except ImportError:
+    DNS_AVAILABLE = False
+    print("⚠️ dnspython no instalado - Funciones DNS deshabilitadas")
+
+try:
+    import whois
+    WHOIS_AVAILABLE = True
+except ImportError:
+    WHOIS_AVAILABLE = False
+    print("⚠️ python-whois no instalado - Funciones WHOIS deshabilitadas")
+
+try:
+    import nmap
+    NMAP_AVAILABLE = True
+except ImportError:
+    NMAP_AVAILABLE = False
+    print("⚠️ python-nmap no instalado - Escáner avanzado deshabilitado")
 
 # --- CONFIGURACIÓN DE LA PÁGINA ---
 st.set_page_config(
