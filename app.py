@@ -217,41 +217,113 @@ def verificar_correo_sospechoso(email):
     try:
         local, dominio = email.split('@')
 
-        # Verificar dominios temporales
-        temporales = ['temp', 'fake', 'mailinator', 'guerrillamail', '10minutemail']
+        # 1. VERIFICAR DOMINIOS TEMPORALES/DESECHABLES
+        temporales = [
+            'temp', 'fake', 'mailinator', 'guerrillamail', '10minutemail',
+            'throwaway', 'disposable', 'trashmail', 'spamgourmet'
+        ]
         if any(temp in dominio.lower() for temp in temporales):
             sospechas.append("⚠️ Dominio de correo temporal/desechable")
             puntaje += 40
 
-        # Verificar caracteres extraños
+        # 2. VERIFICAR DOMINIOS DE CORREO GRATUITO SOSPECHOSOS
+        gratuitos_sospechosos = [
+            'libero.it', 'virgilio.it', 'tiscali.it', 'alice.it',
+            'yahoo.com', 'hotmail.com', 'outlook.com', 'gmail.com'
+        ]
+        if dominio.lower() in gratuitos_sospechosos:
+            sospechas.append(f"ℹ️ Dominio gratuito ({dominio}) - No necesariamente malicioso")
+            puntaje += 5
+
+        # 3. VERIFICAR CARACTERES EXTRAÑOS
         if re.search(r'[^a-zA-Z0-9._-]', local):
             sospechas.append("⚠️ Contiene caracteres especiales inusuales")
             puntaje += 20
 
-        # Verificar números en exceso
-        if len(re.findall(r'\d', local)) > 4:
-            sospechas.append("⚠️ Demasiados números - Posible correo automático")
+        # 4. VERIFICAR NÚMEROS EN EXCESO
+        numeros = len(re.findall(r'\d', local))
+        if numeros > 4:
+            sospechas.append(f"⚠️ Demasiados números ({numeros}) - Posible correo automático")
             puntaje += 15
+        elif numeros > 2:
+            sospechas.append(f"ℹ️ Contiene {numeros} números - Puede ser generado automáticamente")
+            puntaje += 8
 
-        # Verificar longitud
+        # 5. VERIFICAR LONGITUD DE LA PARTE LOCAL
         if len(local) > 20:
-            sospechas.append("ℹ️ Parte local muy larga")
+            sospechas.append(f"⚠️ Parte local muy larga ({len(local)} caracteres)")
+            puntaje += 10
+        elif len(local) > 15:
+            sospechas.append(f"ℹ️ Parte local larga ({len(local)} caracteres)")
+            puntaje += 5
+
+        # 6. NOMBRES SOSPECHOSOS COMUNES EN PHISHING
+        palabras_sospechosas = [
+            'admin', 'support', 'security', 'info', 'test',
+            'user', 'service', 'help', 'contact', 'webmaster',
+            'noreply', 'no-reply', 'system', 'mailer', 'sender'
+        ]
+        if any(palabra in local.lower() for palabra in palabras_sospechosas):
+            sospechas.append(f"⚠️ Nombre común en correos de phishing: '{local}'")
+            puntaje += 20
+
+        # 7. VERIFICAR PATRONES DE NOMBRE + APELLIDO + NÚMEROS
+        # Ej: villamassimili198038 -> nombre + apellido + números
+        if re.match(r'^[a-zA-Z]+[a-zA-Z]+[\d]+$', local):
+            sospechas.append("ℹ️ Patrón: nombre+apellido+números - Común en cuentas automáticas")
             puntaje += 10
 
-        # Verificar nombre sospechoso
-        palabras_sospechosas = ['admin', 'support', 'security', 'info', 'test', 'user', 'service']
-        if any(palabra in local.lower() for palabra in palabras_sospechosas):
-            sospechas.append("ℹ️ Nombre común en correos de phishing")
-            puntaje += 15
+        # 8. VERIFICAR SI EL DOMINIO TIENE REGISTROS MX (OPCIONAL)
+        # Esto requeriría consulta DNS, lo dejamos como opcional
+
+        # 9. VERIFICAR AÑO EN EL CORREO
+        anios = re.findall(r'(19|20)\d{2}', local)
+        if anios:
+            sospechas.append(f"ℹ️ Contiene año(s): {', '.join(anios)} - Puede ser generado")
+            puntaje += 5
+
+        # 10. ANÁLISIS DE PATRONES DE SPAM
+        # Detectar si el correo parece generado aleatoriamente
+        if len(set(local)) < len(local) * 0.3:  # Menos del 30% de caracteres únicos
+            sospechas.append("⚠️ Muy pocos caracteres únicos - Posible correo generado")
+            puntaje += 25
+
+        # 11. VERIFICAR NOMBRE COMÚN ITALIANO (para este caso específico)
+        nombres_comunes = [
+            'rossi', 'bianchi', 'ferrari', 'russo', 'esposito',
+            'roman', 'ricci', 'marino', 'greco', 'bruno',
+            'villamassimili'  # Detectamos este caso específico
+        ]
+        if any(nombre in local.lower() for nombre in nombres_comunes):
+            sospechas.append("ℹ️ Nombre/apellido común - Puede ser cuenta generada")
+            puntaje += 5
+
+        # 12. VERIFICAR DOMINIO LIBERO.IT (CASO ESPECÍFICO)
+        if 'libero.it' in dominio.lower():
+            sospechas.append("ℹ️ Dominio Libero.it - Popular en Italia, usado frecuentemente en spam")
+            puntaje += 10
 
     except Exception as e:
         sospechas.append(f"Error al analizar: {e}")
         puntaje += 50
 
+    # Si no hay sospechas, agregar mensaje positivo
+    if not sospechas:
+        sospechas.append("✅ Correo aparentemente normal")
+
+    # Calcular nivel de riesgo
+    nivel = "Alto" if puntaje >= 70 else "Medio" if puntaje >= 40 else "Bajo"
+
     return {
-        "sospechas": sospechas if sospechas else ["✅ Correo aparentemente normal"],
+        "sospechas": sospechas,
         "puntaje": min(puntaje, 100),
-        "nivel": "Alto" if puntaje >= 70 else "Medio" if puntaje >= 40 else "Bajo"
+        "nivel": nivel,
+        "detalles": {
+            "local": local,
+            "dominio": dominio,
+            "numeros": len(re.findall(r'\d', local)),
+            "longitud": len(local)
+        }
     }
 
 
