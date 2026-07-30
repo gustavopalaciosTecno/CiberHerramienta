@@ -1055,8 +1055,17 @@ elif choice == "🌍 Scanner de Vulnerabilidades Web":
 
     url_scan = st.text_input("URL a escanear:", placeholder="https://ejemplo.com")
 
+    # Variable para guardar el resultado del escaneo y poder usarlo fuera del try
+    resultados_pdf = None
+    escaneo_exitoso = False
+
     if st.button("Iniciar Escaneo de Vulnerabilidades"):
         if url_scan:
+            # --- CORRECCIÓN DE URL AQUÍ (Para evitar el error "No scheme supplied") ---
+            url_scan = url_scan.strip()  # Elimina espacios en blanco
+            if not url_scan.startswith(('http://', 'https://')):
+                url_scan = 'https://' + url_scan  # Si no tiene, le ponemos https por defecto
+
             vulnerabilidades_encontradas = []
             resultados_pdf = {"URL": url_scan, "Análisis": []}
 
@@ -1140,7 +1149,15 @@ elif choice == "🌍 Scanner de Vulnerabilidades Web":
                     resultados_pdf["Análisis"] = "\n".join(
                         vulnerabilidades_encontradas) if vulnerabilidades_encontradas else "Sin vulnerabilidades críticas"
 
-                    # Botón de reporte
+                    escaneo_exitoso = True  # Marcamos que el escaneo terminó bien
+
+                except Exception as e:
+                    st.error(f"Error al escanear: {e}")
+                    st.info("💡 **Sugerencia:** Asegúrate de que la URL sea correcta y que el sitio web esté online.")
+
+            # Botón de reporte (Solo se muestra si el escaneo fue exitoso)
+            if escaneo_exitoso and resultados_pdf:
+                try:
                     pdf_data = generar_pdf("Reporte de Escaneo de Vulnerabilidades", resultados_pdf)
                     st.download_button(
                         label="📥 Descargar Reporte de Vulnerabilidades",
@@ -1148,9 +1165,9 @@ elif choice == "🌍 Scanner de Vulnerabilidades Web":
                         file_name="escaneo_vulnerabilidades.pdf",
                         mime="application/pdf"
                     )
-
                 except Exception as e:
-                    st.error(f"Error al escanear: {e}")
+                    st.error(f"Error al generar el PDF: {e}")
+
         else:
             st.warning("Por favor, ingresa una URL para escanear")
 
