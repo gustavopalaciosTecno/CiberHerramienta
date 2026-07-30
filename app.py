@@ -348,17 +348,41 @@ st.markdown("---")
 # --- BARRA LATERAL ---
 st.sidebar.image("https://cdn-icons-png.flaticon.com/512/2092/2092663.png", width=100)
 st.sidebar.markdown("<h3 style='text-align: center;'>Menú de Herramientas</h3>", unsafe_allow_html=True)
-menu = ["Inicio", "Escáner de Puertos", "Auditoría de Cabeceras", "Auditoría de Inyección",
-        "Laboratorio SQL", "Escáner de Directorios", "Hash de Archivo", "Decodificador de IPs",
-        "Gestor Seguro", "🔍 Análisis VirusTotal", "🔗 Análisis de Enlaces",
-        "📧 Verificador de Correos", "🌐 DNS Lookup", "🛡️ Scanner de Vulnerabilidades Web"]
+menu = [
+    "🏠 Inicio",
+    # --- Red y Servidores ---
+    "🌐 Escáner de Puertos",
+    "🌐 DNS Lookup",
+    "🌐 Geolocalización de IPs",
+    "🌐 Decodificador de IPs",
+    # --- Seguridad Web ---
+    "🌍 Auditoría de Cabeceras",
+    "🌍 Auditoría de Inyección",
+    "🌍 Laboratorio SQL",
+    "🌍 Escáner de Directorios",
+    "🌍 Scanner de Vulnerabilidades Web",
+    "🌍 Verificador SSL",
+    # --- Análisis Forense y Archivos ---
+    "📁 Análisis de Metadatos",
+    "📁 Hash de Archivo",
+    "📁 Analizador de código QR",
+    "📁 Generador de Reportes",
+    # --- Enlaces y Correos ---
+    "🔗 Análisis de Enlaces",
+    "✉️ Verificador de Correos",
+    # --- Gestión y Seguridad ---
+    "🛡️ Gestor Seguro",
+    "🛡️ Análisis VirusTotal",
+    "🛡️ Verificador de Contraseñas",
+    "🛡️ Detector de Malware"
+]
 choice = st.sidebar.selectbox("Selecciona una opción:", menu)
 
 st.sidebar.markdown("---")
 st.sidebar.info("🚀 **Desarrollado por:**\nGustavo Palacios Meyer con la ayuda de la Inteligencia Artificial")
 
 # --- SECCIÓN: INICIO ---
-if choice == "Inicio":
+if choice == "🏠 Inicio":
     st.subheader("🤫 Bienvenido al panel")
     col1, col2 = st.columns([2, 1])
     with col1:
@@ -387,6 +411,7 @@ if choice == "Inicio":
         * **Laboratorio SQL:** Aprender a proteger bases de datos contra ataques de inyección.
         * **Verificar Integridad:** Analizar archivos mediante algoritmos de hashing.
         * **Escáner de Directorios:** Enumeración de directorios por fuerza bruta.
+        * **Has de archivos:** Sube un archivo para obtener su huella digital única y compararla con amenazas.
         * **Análisis VirusTotal:** Verificar archivos y enlaces en bases de datos de amenazas.
         * **Análisis de Enlaces:** Detectar enlaces sospechosos y de phishing.
         * **Verificador de Correos:** Analizar correos electrónicos sospechosos.
@@ -394,14 +419,16 @@ if choice == "Inicio":
         * **Scanner de Vulnerabilidades:** Escaneo completo de seguridad web.
         * **Seguridad de Acceso:** Generar contraseñas robustas.
         * **Decodificador de IPs:** Revelar IPs ocultas tras formatos Hex/Octal.
+        * **Gestor seguro:** Configura los parámetros para crear una contraseña con alta entropía.
         * **Reportes Profesionales:** Generar documentos PDF detallados.
+        * **Análisis de Malware:** Análisis de Malware con el aval de virustotal.
         """)
     with col2:
         st.info(
             "**Nota Educativa:** El uso de estas herramientas contra sistemas sin autorización es ilegal. Úsalas solo en entornos controlados o con permiso.")
 
 # --- SECCIÓN: ESCÁNER DE PUERTOS ---
-elif choice == "Escáner de Puertos":
+elif choice == "🌐 Escáner de Puertos":
     st.subheader("🌐 Escáner de Puertos y Riesgos")
 
     explicaciones_puertos = {
@@ -460,7 +487,7 @@ elif choice == "Escáner de Puertos":
             st.error(f"Error inesperado: {e}")
 
 # --- SECCIÓN: AUDITORÍA DE CABECERAS ---
-elif choice == "Auditoría de Cabeceras":
+elif choice == "🌍 Auditoría de Cabeceras":
     st.subheader("🛡️ Análisis de Cabeceras de Seguridad")
     url = st.text_input("URL (con http/https)", "https://")
 
@@ -487,7 +514,7 @@ elif choice == "Auditoría de Cabeceras":
                 st.error(f"Error: {e}")
 
 # --- SECCIÓN: AUDITORÍA DE INYECCIÓN ---
-elif choice == "Auditoría de Inyección":
+elif choice == "🌍 Auditoría de Inyección":
     st.subheader("💉 Prueba de Vulnerabilidad XSS (Reflejado)")
     st.write("""
     Esta herramienta verifica si un parámetro de una URL es vulnerable a Cross-Site Scripting.
@@ -564,7 +591,7 @@ elif choice == "Auditoría de Inyección":
                 st.error(f"Error: {e}")
 
 # --- SECCIÓN: LABORATORIO SQL ---
-elif choice == "Laboratorio SQL":
+elif choice == "🌍 Laboratorio SQL":
     st.subheader("🗄️ Laboratorio de Inyección SQL y Prevención")
     st.info("Este módulo es interactivo y educativo. No realiza ataques reales, sino que simula cómo funcionan.")
 
@@ -621,7 +648,7 @@ $resultado = $stmt->fetch();
         "✅ Con este método, el motor de base de datos trata la entrada como **texto**, no como código ejecutable.")
 
 # --- SECCIÓN: ESCÁNER DE DIRECTORIOS ---
-elif choice == "Escáner de Directorios":
+elif choice == "🌍 Escáner de Directorios":
     st.subheader("📁 Escáner de Directorios Sensibles")
     st.write("Esta herramienta busca rutas comunes que podrían exponer información crítica del servidor.")
 
@@ -678,7 +705,7 @@ elif choice == "Escáner de Directorios":
                                "application/pdf")
 
 # --- SECCIÓN: HASH DE ARCHIVO ---
-elif choice == "Hash de Archivo":
+elif choice == "📁 Hash de Archivo":
     st.subheader("🔍 Análisis de Integridad (SHA-256)")
 
     with st.expander("💡 ¿Problemas al subir archivos?"):
@@ -732,7 +759,7 @@ elif choice == "Hash de Archivo":
             st.error(f"Error al procesar el archivo: {e}")
 
 # --- SECCIÓN: DECODIFICADOR DE IPs ---
-elif choice == "Decodificador de IPs":
+elif choice == "🌐 Decodificador de IPs":
     st.subheader("🕵️‍♂️ Decodificador de IPs Ofuscadas")
     st.write(
         "Esta herramienta revela la IP real detrás de direcciones ofuscadas en formato Hexadecimal, Octal o Decimal (técnicas comunes en Phishing).")
@@ -760,7 +787,7 @@ elif choice == "Decodificador de IPs":
             st.warning("Por favor, ingresa una dirección para analizar.")
 
 # --- SECCIÓN: GESTOR SEGURO ---
-elif choice == "Gestor Seguro":
+elif choice == "🛡️ Gestor Seguro":
     st.subheader("🛡️ Generador de Contraseñas Robustas")
     st.write("Configura los parámetros para crear una contraseña con alta entropía.")
 
@@ -799,7 +826,7 @@ elif choice == "Gestor Seguro":
                 st.warning("Nivel de seguridad: **Bajo** (se recomienda aumentar la longitud)")
 
 # --- SECCIÓN: ANÁLISIS VIRUSTOTAL ---
-elif choice == "🔍 Análisis VirusTotal":
+elif choice == "🛡️ Análisis VirusTotal":
     st.subheader("🔍 Análisis de Archivos con VirusTotal")
     st.write("""
     Sube un archivo para verificar su reputación en VirusTotal.
@@ -920,7 +947,7 @@ elif choice == "🔗 Análisis de Enlaces":
             st.warning("Por favor, ingresa una URL para analizar")
 
 # --- SECCIÓN: VERIFICADOR DE CORREOS ---
-elif choice == "📧 Verificador de Correos":
+elif choice == "✉️ Verificador de Correos":
     st.subheader("📧 Verificador de Correos Electrónicos")
     st.write("""
     Analiza direcciones de correo electrónico en busca de características sospechosas
@@ -1013,7 +1040,7 @@ elif choice == "🌐 DNS Lookup":
             st.warning("Por favor, ingresa un dominio para consultar")
 
 # --- SECCIÓN: SCANNER DE VULNERABILIDADES WEB ---
-elif choice == "🛡️ Scanner de Vulnerabilidades Web":
+elif choice == "🌍 Scanner de Vulnerabilidades Web":
     st.subheader("🛡️ Escáner de Vulnerabilidades Web")
     st.write("""
     Realiza un escaneo básico de vulnerabilidades comunes en sitios web:
@@ -1124,21 +1151,440 @@ elif choice == "🛡️ Scanner de Vulnerabilidades Web":
         else:
             st.warning("Por favor, ingresa una URL para escanear")
 
-# --- PIE DE PÁGINA ---
-st.markdown("---")
-st.markdown(
-    """
-    <div style="
-        text-align: center; 
-        user-select: none; 
-        color: #7d7d7d; 
-        font-size: 14px;
-        padding: 20px;
-    ">
-        © 2026 - <b>Servicios Palacios Web</b><br>
-        Desarrollado con ❤️ en Charata, Chaco, Argentina.<br>
-        <i>Enfocados en la seguridad y eficiencia de sistemas educativos.</i>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+# --- SECCIÓN: ANÁLISIS DE QR CODES ---
+elif choice == "📁 Analizador de código QR":
+    st.subheader("📱 Escáner y Analizador de Códigos QR")
+    st.write("""
+    Sube una imagen con un código QR para:
+    - Decodificar su contenido
+    - Verificar si enlaza a sitios maliciosos
+    - Analizar la seguridad del enlace
+    """)
+
+    try:
+        from PIL import Image
+        from pyzbar.pyzbar import decode
+        import io
+
+        uploaded_qr = st.file_uploader("Sube imagen del QR Code", type=['png', 'jpg', 'jpeg', 'webp', 'bmp'])
+
+        if uploaded_qr is not None:
+            try:
+                image = Image.open(io.BytesIO(uploaded_qr.getvalue()))
+                decoded_objects = decode(image)
+
+                if decoded_objects:
+                    st.success(f"✅ Se encontraron {len(decoded_objects)} códigos QR")
+
+                    for idx, obj in enumerate(decoded_objects, 1):
+                        data = obj.data.decode('utf-8')
+                        st.markdown(f"**QR #{idx}**")
+                        st.code(data, language="text")
+
+                        if data.startswith(('http://', 'https://')):
+                            st.markdown("---")
+                            st.markdown("### 🔗 Análisis del enlace")
+                            resultado = analizar_enlace(data)
+
+                            nivel = resultado['nivel']
+                            color = "risk-high" if nivel == "Alto" else "risk-medium" if nivel == "Medio" else "risk-low"
+                            st.markdown(
+                                f"**Nivel de Riesgo:** <span class='{color}'>{nivel} ({resultado['puntaje']}%)</span>",
+                                unsafe_allow_html=True)
+
+                            for riesgo in resultado['riesgos']:
+                                st.write(riesgo)
+
+                            if resultado['puntaje'] >= 40:
+                                st.warning(
+                                    "⚠️ El QR Code enlaza a un sitio sospechoso. ¡No escanees códigos QR desconocidos!")
+                            else:
+                                st.success("✅ El enlace parece seguro")
+
+                            resultados_pdf = {
+                                "Contenido QR": data,
+                                "Nivel de Riesgo": f"{nivel} ({resultado['puntaje']}%)",
+                                "Hallazgos": "\n".join(resultado['riesgos'])
+                            }
+
+                            pdf_data = generar_pdf("Análisis de QR Code", resultados_pdf)
+                            st.download_button(
+                                label="📥 Descargar Reporte PDF",
+                                data=pdf_data,
+                                file_name="analisis_qr.pdf",
+                                mime="application/pdf"
+                            )
+                        else:
+                            st.info(f"ℹ️ El QR contiene texto plano (no es una URL): {data}")
+
+                else:
+                    st.error(
+                        "❌ No se pudo decodificar el código QR. Asegúrate de que la imagen sea clara y contenga un QR válido.")
+
+            except Exception as e:
+                st.error(f"Error al procesar el QR: {e}")
+                st.info("💡 Asegúrate de que el archivo sea una imagen válida con un código QR legible.")
+
+    except ImportError as e:
+        st.error("❌ Dependencias no instaladas")
+        st.markdown("""
+        Para usar esta función, necesitas instalar las siguientes librerías:
+
+        ```bash
+        pip install pillow pyzbar
+        """)
+
+# --- SECCIÓN: VERIFICADOR DE CONTRASEÑAS ROBADAS ---
+elif choice == "🛡️ Verificador de Contraseñas":
+    st.subheader("🔐 ¿Tu contraseña ha sido comprometida?")
+    st.write("""
+    Esta herramienta verifica si tu contraseña ha aparecido en filtraciones de datos
+    usando el servicio Have I Been Pwned (API de k-anonimidad).
+    **Nota:** Tu contraseña nunca se envía completa, solo los primeros 5 caracteres del hash.
+    """)
+
+    password = st.text_input("Ingresa la contraseña a verificar:", type="password")
+
+    if st.button("Verificar si ha sido comprometida"):
+        if password:
+            try:
+                sha1_hash = hashlib.sha1(password.encode()).hexdigest().upper()
+                prefix = sha1_hash[:5]
+                suffix = sha1_hash[5:]
+
+                url = f"https://api.pwnedpasswords.com/range/{prefix}"
+                response = requests.get(url)
+
+                if response.status_code == 200:
+                    hashes = response.text.split('\n')
+                    encontrado = False
+
+                    for h in hashes:
+                        if h.startswith(suffix):
+                            count = int(h.split(':')[1])
+                            encontrado = True
+                            st.error(f"🚨 ¡ALERTA! Esta contraseña ha sido filtrada {count} veces!")
+                            st.info("💡 **Recomendación:** Cambia esta contraseña inmediatamente y no la uses en otros sitios.")
+                            break
+
+                    if not encontrado:
+                        st.success("✅ ¡Buena noticia! Esta contraseña no ha sido encontrada en filtraciones conocidas.")
+                else:
+                    st.error("Error al consultar la API")
+
+            except Exception as e:
+                st.error(f"Error: {e}")
+# --- SECCIÓN: GEOLOCALIZACIÓN DE IPS ---
+elif choice == "🌐 Geolocalización de IPs":
+    st.subheader("🌍 Geolocalización y Análisis de IP")
+    st.write("""
+    Obtén información detallada sobre una dirección IP:
+    - Ubicación geográfica
+    - ISP/Proveedor
+    - Coordenadas
+    - Mapa interactivo
+    """)
+
+    ip_geo = st.text_input("Ingresa la IP a geolocalizar:", placeholder="8.8.8.8")
+
+    if st.button("Geolocalizar IP"):
+        if ip_geo:
+            try:
+                response = requests.get(f"http://ip-api.com/json/{ip_geo}")
+                data = response.json()
+
+                if data.get('status') == 'success':
+                    col1, col2 = st.columns(2)
+
+                    with col1:
+                        st.markdown("### 📍 Información de Ubicación")
+                        st.write(f"**País:** {data.get('country', 'N/A')}")
+                        st.write(f"**Región:** {data.get('regionName', 'N/A')}")
+                        st.write(f"**Ciudad:** {data.get('city', 'N/A')}")
+                        st.write(f"**Código Postal:** {data.get('zip', 'N/A')}")
+                        st.write(f"**Coordenadas:** {data.get('lat', 'N/A')}, {data.get('lon', 'N/A')}")
+
+                    with col2:
+                        st.markdown("### 🌐 Información de Red")
+                        st.write(f"**ISP:** {data.get('isp', 'N/A')}")
+                        st.write(f"**Organización:** {data.get('org', 'N/A')}")
+                        st.write(f"**AS:** {data.get('as', 'N/A')}")
+                        st.write(f"**Zona Horaria:** {data.get('timezone', 'N/A')}")
+                        st.write(f"**Código País:** {data.get('countryCode', 'N/A')}")
+
+                    if data.get('lat') and data.get('lon'):
+                        st.markdown("### 🗺️ Ubicación en el Mapa")
+                        st.map({
+                            "lat": [data['lat']],
+                            "lon": [data['lon']]
+                        })
+
+                    st.markdown("### 🔍 Análisis adicional")
+                    col3, col4 = st.columns(2)
+                    with col3:
+                        st.info(f"🔍 [VirusTotal IP](https://www.virustotal.com/gui/ip-address/{ip_geo})")
+                    with col4:
+                        st.info(f"🌎 [IP Info](https://ipinfo.io/{ip_geo})")
+
+                else:
+                    st.error("No se pudo geolocalizar la IP")
+
+            except Exception as e:
+                st.error(f"Error: {e}")
+# --- SECCIÓN: ANÁLISIS DE METADATOS ---
+elif choice == "📁 Análisis de Metadatos":
+    st.subheader("📊 Análisis Forense de Metadatos")
+    st.write("""
+    Extrae y analiza metadatos ocultos de archivos:
+    - Fotos (EXIF)
+    - Documentos PDF
+    - Imágenes (GPS, fecha, modelo de cámara)
+    """)
+
+    try:
+        from PIL import Image
+        from PIL.ExifTags import TAGS
+
+        uploaded_meta = st.file_uploader("Sube un archivo para analizar",
+                                         type=['jpg', 'jpeg', 'png', 'pdf', 'docx'])
+
+        if uploaded_meta is not None:
+            try:
+                # --- ANÁLISIS DE IMÁGENES ---
+                if uploaded_meta.type in ['image/jpeg', 'image/png']:
+                    image = Image.open(uploaded_meta)
+                    exifdata = image.getexif()
+
+                    st.markdown("### 🖼️ Metadatos de la Imagen")
+
+                    if exifdata:
+                        for tag_id, value in exifdata.items():
+                            tag = TAGS.get(tag_id, tag_id)
+
+                            # --- CORRECCIÓN PARA DATOS BINARIOS ---
+                            # Si es GPS o MakerNote (que suelen ser binarios complejos)
+                            if tag in ['GPSInfo', 'MakerNote']:
+                                st.info(f"**{tag}:** [Datos binarios complejos. Requiere decodificación externa]")
+
+                            # Si el valor es un objeto 'bytes' (como el 59932 que te salió)
+                            elif isinstance(value, bytes):
+                                # Muestra solo los primeros 20 bytes para no saturar la pantalla
+                                st.write(f"**{tag}:** [Datos binarios (primeros 20 bytes): {value[:20]}]")
+                                # Si prefieres ocultarlo del todo, usa esta línea en vez de la de arriba:
+                                # st.write(f"**{tag}:** [Dato binario no legible]")
+
+                            # Si el valor es texto o números, lo mostramos normal
+                            else:
+                                st.write(f"**{tag}:** {value}")
+                    else:
+                        st.info("No se encontraron metadatos EXIF")
+
+                # --- ANÁLISIS DE PDF ---
+                elif uploaded_meta.type == 'application/pdf':
+                    try:
+                        import PyPDF2
+
+                        pdf_reader = PyPDF2.PdfReader(uploaded_meta)
+
+                        st.markdown("### 📄 Metadatos del PDF")
+                        info = pdf_reader.metadata
+                        if info:
+                            for key, value in info.items():
+                                st.write(f"**{key}:** {value}")
+                        else:
+                            st.info("No se encontraron metadatos")
+                    except ImportError:
+                        st.warning("Instala PyPDF2: pip install PyPDF2")
+
+                # --- OTROS ARCHIVOS ---
+                else:
+                    st.markdown("### 📦 Metadatos del Archivo")
+                    st.info(f"**Nombre:** {uploaded_meta.name}")
+                    st.info(f"**Tamaño:** {len(uploaded_meta.getvalue())} bytes")
+                    st.info(f"**Tipo:** {uploaded_meta.type}")
+
+            except Exception as e:
+                st.error(f"Error al analizar metadatos: {e}")
+
+    except ImportError:
+        st.warning("Instala Pillow: pip install pillow")
+# --- SECCIÓN: VERIFICADOR SSL ---
+elif choice == "🌍 Verificador SSL":
+    st.subheader("🔒 Verificador de Certificados SSL/TLS")
+    st.write("""
+    Analiza la seguridad y validez de certificados SSL de sitios web.
+    """)
+
+    dominio_ssl = st.text_input("Ingresa el dominio a verificar SIN HTTPS:", placeholder="ejemplo.com")
+
+    if st.button("Verificar Certificado SSL"):
+        if dominio_ssl:
+            try:
+                import ssl
+                import socket
+                from datetime import datetime
+
+                context = ssl.create_default_context()
+                with socket.create_connection((dominio_ssl, 443), timeout=10) as sock:
+                    with context.wrap_socket(sock, server_hostname=dominio_ssl) as ssock:
+                        cert = ssock.getpeercert()
+
+                st.markdown("### 📋 Información del Certificado")
+
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.write("**Emisor:**")
+                    st.code(str(cert.get('issuer', 'N/A')))
+                    st.write("**Sujeto:**")
+                    st.code(str(cert.get('subject', 'N/A')))
+
+                with col2:
+                    not_before = datetime.strptime(cert['notBefore'], '%b %d %H:%M:%S %Y %Z')
+                    not_after = datetime.strptime(cert['notAfter'], '%b %d %H:%M:%S %Y %Z')
+
+                    st.write("**Válido desde:**")
+                    st.write(not_before.strftime('%d/%m/%Y %H:%M:%S'))
+                    st.write("**Válido hasta:**")
+                    st.write(not_after.strftime('%d/%m/%Y %H:%M:%S'))
+
+                    hoy = datetime.now()
+                    if hoy > not_after:
+                        st.error("❌ ¡CERTIFICADO EXPIRADO!")
+                    elif (not_after - hoy).days < 30:
+                        st.warning(f"⚠️ El certificado expira en {(not_after - hoy).days} días")
+                    else:
+                        st.success(f"✅ Certificado válido por {(not_after - hoy).days} días")
+
+                st.markdown("### 🔍 Detalles Técnicos")
+                st.write(f"**Versión:** {cert.get('version', 'N/A')}")
+                st.write(f"**Número de Serie:** {cert.get('serialNumber', 'N/A')}")
+
+                st.info(f"🔍 [Verificar en SSL Labs](https://www.ssllabs.com/ssltest/analyze.html?d={dominio_ssl})")
+
+            except Exception as e:
+                st.error(f"Error al verificar certificado: {e}")
+# --- SECCIÓN: GENERADOR DE REPORTES ---
+elif choice == "📁 Generador de Reportes":
+    st.subheader("📊 Generador de Reportes de Seguridad")
+    st.write("""
+    Genera un reporte completo de seguridad combinando múltiples análisis:
+    - Escaneo de puertos
+    - Análisis de cabeceras
+    - Verificación SSL
+    - Análisis de DNS
+    """)
+
+    target_report = st.text_input("URL o dominio para análisis completo:", placeholder="ejemplo.com")
+
+    if st.button("Generar Reporte Completo"):
+        if target_report:
+            with st.spinner("Generando reporte completo de seguridad..."):
+                resultados = {
+                    "Target": target_report,
+                    "Fecha": datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
+                    "Análisis": {}
+                }
+
+                clean_target = target_report.replace('https://', '').replace('http://', '').split('/')[0]
+
+                try:
+                    if not target_report.startswith('http'):
+                        target_report = 'https://' + target_report
+                    response = requests.get(target_report, timeout=10)
+                    resultados["Análisis"]["Cabeceras"] = dict(response.headers)
+                    resultados["Análisis"]["Estado"] = response.status_code
+                except:
+                    resultados["Análisis"]["Cabeceras"] = "Error al obtener cabeceras"
+
+                try:
+                    import ssl, socket
+                    context = ssl.create_default_context()
+                    with socket.create_connection((clean_target, 443), timeout=10) as sock:
+                        with context.wrap_socket(sock, server_hostname=clean_target) as ssock:
+                            cert = ssock.getpeercert()
+                            resultados["Análisis"]["SSL"] = "Certificado válido"
+                except:
+                    resultados["Análisis"]["SSL"] = "Error al verificar SSL o no usa HTTPS"
+
+                try:
+                    puertos_comunes = [80, 443, 21, 22, 25, 3306]
+                    puertos_abiertos = []
+                    ip = socket.gethostbyname(clean_target)
+
+                    for port in puertos_comunes:
+                        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                        socket.setdefaulttimeout(1)
+                        result = sock.connect_ex((ip, port))
+                        if result == 0:
+                            puertos_abiertos.append(port)
+                        sock.close()
+
+                    resultados["Análisis"]["Puertos_Abiertos"] = puertos_abiertos
+                except:
+                    resultados["Análisis"]["Puertos_Abiertos"] = "Error en escaneo de puertos"
+
+                st.success("✅ Reporte generado correctamente")
+                st.json(resultados)
+
+                pdf_data = generar_pdf("Reporte Completo de Seguridad", resultados)
+                st.download_button(
+                    label="📥 Descargar Reporte Completo PDF",
+                    data=pdf_data,
+                    file_name=f"reporte_seguridad_{clean_target}.pdf",
+                    mime="application/pdf"
+                )
+# --- SECCIÓN: DETECTOR DE ARCHIVOS MALICIOSOS ---
+elif choice == "🛡️ Detector de Malware":
+    st.subheader("🛡️ Detección de Archivos Maliciosos")
+    st.write("""
+    Analiza archivos sospechosos utilizando:
+    - Firmas YARA (básico)
+    - Análisis de extensión
+    - Verificación de hash en bases de datos
+    """)
+
+    file_malware = st.file_uploader("Sube archivo para análisis", type=None)
+
+    if file_malware is not None:
+        firmas_malware = {
+            b'<?php eval': "PHP Shell",
+            b'<?php system': "PHP Backdoor",
+            b'<script>alert': "XSS Payload",
+            b'eval(base64_decode': "PHP Encoded Malware",
+            b'powershell -e': "PowerShell Encoded",
+            b'cmd.exe /c': "Windows Command",
+            b'<?= eval': "PHP Short Tag Malware",
+            b'exec(': "PHP Exec Function",
+            b'shell_exec(': "PHP Shell Exec"
+        }
+
+        file_content = file_malware.getvalue()
+        extension = file_malware.name.split('.')[-1].lower()
+
+        st.markdown("### 🔍 Análisis del Archivo")
+        col1, col2 = st.columns(2)
+        with col1:
+            st.metric("Nombre", file_malware.name)
+        with col2:
+            st.metric("Tamaño", f"{len(file_content)} bytes")
+
+        ext_peligrosas = ['exe', 'bat', 'cmd', 'com', 'scr', 'vbs', 'js', 'jar', 'apk']
+
+        if extension in ext_peligrosas:
+            st.warning(f"⚠️ Extensión '{extension}' potencialmente peligrosa")
+
+        st.markdown("### 🦠 Análisis de Firmas")
+        encontrado = False
+        for firma, nombre in firmas_malware.items():
+            if firma in file_content[:1000]:
+                st.error(f"🚨 **¡ALERTA!** Firmas de {nombre} detectadas")
+                encontrado = True
+
+        if not encontrado:
+            st.success("✅ No se detectaron firmas maliciosas comunes")
+
+        sha256 = hashlib.sha256(file_content).hexdigest()
+        st.markdown("### 🔑 Hash del Archivo")
+        st.code(sha256)
+        st.markdown(f"[🔍 Verificar en VirusTotal](https://www.virustotal.com/gui/file/{sha256})")
+

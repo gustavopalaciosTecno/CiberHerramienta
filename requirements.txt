@@ -1,6 +1,20 @@
+# Core - Obligatorias
 streamlit
-python-nmap
 requests
 fpdf
+
+# Análisis de DNS
 dnspython
+
+# Análisis WHOIS (opcional)
 python-whois
+
+# Procesamiento de imágenes y QR
+pillow
+pyzbar
+
+# Análisis de PDF
+PyPDF2
+
+# Escaneo avanzado (opcional)
+python-nmap
