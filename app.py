@@ -378,6 +378,9 @@ menu = [
 ]
 choice = st.sidebar.selectbox("Selecciona una opción:", menu)
 
+# ... después del selectbox ...
+st.sidebar.markdown("---")
+st.sidebar.caption(f"🔧 {len(menu) - 1} herramientas disponibles") # Restamos 1 porque 'Inicio' no es una herramienta
 st.sidebar.markdown("---")
 st.sidebar.info("🚀 **Desarrollado por:**\nGustavo Palacios Meyer con la ayuda de la Inteligencia Artificial")
 
